@@ -5,11 +5,11 @@ import (
 )
 
 type numberCollection[T []E, E constraints.Integer | constraints.Float] struct {
-	anySlice[T, E]
+	sliceCollection[T, E]
 }
 
 func Number[T []E, E constraints.Integer | constraints.Float](items T) *numberCollection[T, E] {
-	return &numberCollection[T, E]{anySlice[T, E]{Items: items}}
+	return &numberCollection[T, E]{sliceCollection[T, E]{Items: items}}
 }
 
 func (c *numberCollection[T, E]) Sum() (total E) {

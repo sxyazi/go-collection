@@ -20,7 +20,7 @@ func Get[V, K comparable](item any, key K) (V, error) {
 			return zero, errors.New("invalid map index")
 		}
 	case reflect.Array, reflect.Slice:
-		if index, err := strconv.Atoi(fmt.Sprintf("%d", key)); err != nil {
+		if index, err := strconv.Atoi(fmt.Sprintf("%d", interface{}(key))); err != nil {
 			return zero, err
 		} else {
 			if index < 0 || index >= refOfItem.Len() {
@@ -30,14 +30,11 @@ func Get[V, K comparable](item any, key K) (V, error) {
 			result = refOfItem.Index(index).Interface()
 		}
 	case reflect.Struct:
-		if r := refOfItem.FieldByName(fmt.Sprintf("%s", key)); r.IsValid() {
+		if r := refOfItem.FieldByName(fmt.Sprintf("%s", interface{}(key))); r.IsValid() {
 			result = r.Interface()
 		} else {
 			return zero, errors.New("invalid struct field")
 		}
-	case reflect.Interface:
-		fmt.Println("reflect.Interface")
-		// TODO
 	case reflect.Pointer:
 		return Get[V, K](refOfItem.Elem().Interface(), key)
 	default:
@@ -52,7 +49,22 @@ func Get[V, K comparable](item any, key K) (V, error) {
 	}
 }
 
-func Pluck[K, V comparable](items []map[K]V, key K) []V {
+func Pluck[V, K, I comparable](items []I, key K) []V {
+	var zero V
+	plucked := make([]V, len(items), cap(items))
+
+	for i, item := range items {
+		if v, err := Get[V](item, key); err == nil {
+			plucked[i] = v
+		} else {
+			plucked[i] = zero
+		}
+	}
+
+	return plucked
+}
+
+func MapPluck[K, V comparable](items []map[K]V, key K) []V {
 	var zero V
 	plucked := make([]V, len(items), cap(items))
 
@@ -67,17 +79,38 @@ func Pluck[K, V comparable](items []map[K]V, key K) []V {
 	return plucked
 }
 
-func PluckAny[V, K, I comparable](items []I, key K) []V {
-	var zero V
-	plucked := make([]V, len(items), cap(items))
-
-	for i, item := range items {
+func KeyBy[V, K, I comparable](items []I, key K) map[V]I {
+	result := make(map[V]I)
+	for _, item := range items {
 		if v, err := Get[V](item, key); err == nil {
-			plucked[i] = v
-		} else {
-			plucked[i] = zero
+			result[v] = item
 		}
 	}
+	return result
+}
 
-	return plucked
+func MapKeyBy[K, V comparable](items []map[K]V, key K) map[V]map[K]V {
+	result := make(map[V]map[K]V)
+	for _, item := range items {
+		result[item[key]] = item
+	}
+	return result
+}
+
+func GroupBy[V, K, I comparable](items []I, key K) map[V][]I {
+	result := make(map[V][]I)
+	for _, item := range items {
+		if v, err := Get[V](item, key); err == nil {
+			result[v] = append(result[v], item)
+		}
+	}
+	return result
+}
+
+func MapGroupBy[K, V comparable](items []map[K]V, key K) map[V][]map[K]V {
+	result := make(map[V][]map[K]V)
+	for _, item := range items {
+		result[item[key]] = append(result[item[key]], item)
+	}
+	return result
 }

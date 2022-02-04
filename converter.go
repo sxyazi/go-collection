@@ -57,7 +57,7 @@ func stringToNumber[T constraints.Integer | constraints.Float](s string) (result
 	return
 }
 
-func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](collection *anySlice[T, E]) *numberCollection[[]N, N] {
+func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](collection *sliceCollection[T, E]) *numberCollection[[]N, N] {
 	if collection.Empty() {
 		return &numberCollection[[]N, N]{}
 	}
@@ -72,5 +72,5 @@ func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](
 		}
 	}
 
-	return &numberCollection[[]N, N]{anySlice[[]N, N]{Items: items}}
+	return &numberCollection[[]N, N]{sliceCollection[[]N, N]{Items: items}}
 }
