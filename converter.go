@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func stringToNumber[T constraints.Integer | constraints.Float](s string) (result T, _ error) {
+func StringToNumber[T constraints.Integer | constraints.Float](s string) (result T, _ error) {
 	switch interface{}(result).(type) {
 	// Signed
 	case int:
@@ -57,20 +57,21 @@ func stringToNumber[T constraints.Integer | constraints.Float](s string) (result
 	return
 }
 
-func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](collection *sliceCollection[T, E]) *numberCollection[[]N, N] {
-	if collection.Empty() {
+func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](c *sliceCollection[T, E]) *numberCollection[[]N, N] {
+	if c.Empty() {
 		return &numberCollection[[]N, N]{}
 	}
 
-	items := make([]N, len(collection.Items), cap(collection.Items))
-	for key, item := range collection.Items {
+	z := c.Items()
+	items := make([]N, len(z), cap(z))
+	for key, item := range z {
 		switch v := (interface{})(item).(type) {
 		case string:
-			items[key], _ = stringToNumber[N](v)
+			items[key], _ = StringToNumber[N](v)
 		default:
-			items[key], _ = stringToNumber[N](fmt.Sprintf("%d", v))
+			items[key], _ = StringToNumber[N](fmt.Sprintf("%d", v))
 		}
 	}
 
-	return &numberCollection[[]N, N]{sliceCollection[[]N, N]{Items: items}}
+	return &numberCollection[[]N, N]{sliceCollection[[]N, N]{z: items}}
 }

@@ -5,6 +5,11 @@ import (
 	"testing"
 )
 
+// TODO
+func TestStringToNumber(t *testing.T) {
+
+}
+
 func TestNumberFrom(t *testing.T) {
 	c1 := collect.Slice([]string{"1", "2", "Hello", "3"})
 	if collect.NumberFrom[float64](c1).Avg() != 1.5 {
@@ -16,7 +21,7 @@ func TestNumberFrom(t *testing.T) {
 		t.Fail()
 	}
 
-	c3 := collect.Slice([]Foo{Foo{}})
+	c3 := collect.Slice([]Foo{{}})
 	if collect.NumberFrom[uint](c3).Sum() != 0 {
 		t.Fail()
 	}

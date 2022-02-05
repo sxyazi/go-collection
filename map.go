@@ -1,6 +1,6 @@
 package collect
 
-type mapCollection[T map[K]V, K, V comparable] struct {
+type mapCollection[T map[K]V, K comparable, V any] struct {
 	Items T
 }
 
@@ -64,4 +64,16 @@ func (c *mapCollection[T, K, V]) Get(key K) (value V, _ bool) {
 	}
 
 	return c.Items[key], true
+}
+
+func (c *mapCollection[T, K, V]) Merge(target T) *mapCollection[T, K, V] {
+	for key, value := range target {
+		c.Items[key] = value
+	}
+	return c
+}
+
+// TODO
+func (c *mapCollection[T, K, V]) Union() *mapCollection[T, K, V] {
+	return c
 }
