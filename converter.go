@@ -62,7 +62,7 @@ func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](
 		return &numberCollection[[]N, N]{}
 	}
 
-	z := c.Items()
+	z := c.All()
 	items := make([]N, len(z), cap(z))
 	for key, item := range z {
 		switch v := (interface{})(item).(type) {

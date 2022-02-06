@@ -1,75 +1,66 @@
 package collect
 
+import "fmt"
+
 type mapCollection[T map[K]V, K comparable, V any] struct {
-	Items T
+	z T
 }
 
-func Map[T map[K]V, K, V comparable](items T) *mapCollection[T, K, V] {
-	return &mapCollection[T, K, V]{Items: items}
+func UseMap[T map[K]V, K, V comparable](items T) *mapCollection[T, K, V] {
+	return &mapCollection[T, K, V]{z: items}
+}
+
+func (c *mapCollection[T, K, V]) All() T {
+	return c.z
+}
+
+func (c *mapCollection[T, K, V]) Len() int {
+	return len(c.z)
+}
+
+func (c *mapCollection[T, K, V]) Empty() bool {
+	return len(c.z) == 0
+}
+
+func (c *mapCollection[T, K, V]) Print() *mapCollection[T, K, V] {
+	fmt.Println(c.z)
+	return c
 }
 
 func (c *mapCollection[T, K, V]) Only(keys ...K) *mapCollection[T, K, V] {
-	k := Slice(keys)
-	for _, key := range keys {
-		if !k.Contains(key) {
-			delete(c.Items, key)
-		}
-	}
-
+	c.z = Only[T, K, V](c.All(), keys...)
 	return c
 }
 
 func (c *mapCollection[T, K, V]) Except(keys ...K) *mapCollection[T, K, V] {
-	for _, key := range keys {
-		delete(c.Items, key)
-	}
-
+	c.z = Except[T, K, V](c.All(), keys...)
 	return c
 }
 
-func (c *mapCollection[T, K, V]) Keys() (keys []K) {
-	for key := range c.Items {
-		keys = append(keys, key)
-	}
-	return
+func (c *mapCollection[T, K, V]) Keys() []K {
+	return Keys[T, K, V](c.All())
 }
 
 func (c *mapCollection[T, K, V]) DiffKeys(target T) *mapCollection[T, K, V] {
-	items := make(T, len(target))
-	for key := range c.Items {
-		if _, ok := target[key]; !ok {
-			items[key] = c.Items[key]
-		}
-	}
-
+	c.z = DiffKeys[T, K, V](c.All(), target)
 	return c
 }
 
 func (c *mapCollection[T, K, V]) Has(key K) bool {
-	if _, ok := c.Items[key]; ok {
-		return true
-	} else {
-		return false
-	}
+	return Has[T, K, V](c.All(), key)
 }
 
 func (c *mapCollection[T, K, V]) Set(key K, value V) *mapCollection[T, K, V] {
-	c.Items[key] = value
+	c.z = Set(c.All(), key, value)
 	return c
 }
 
 func (c *mapCollection[T, K, V]) Get(key K) (value V, _ bool) {
-	if !c.Has(key) {
-		return
-	}
-
-	return c.Items[key], true
+	return Get[T, K, V](c.All(), key)
 }
 
-func (c *mapCollection[T, K, V]) Merge(target T) *mapCollection[T, K, V] {
-	for key, value := range target {
-		c.Items[key] = value
-	}
+func (c *mapCollection[T, K, V]) Merge(targets ...T) *mapCollection[T, K, V] {
+	c.z = MapMerge[T, K, V](c.All(), targets...)
 	return c
 }
 

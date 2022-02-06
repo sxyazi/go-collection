@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func Get[V, K comparable](item any, key K) (V, error) {
+func AnyGet[V, K comparable](item any, key K) (V, error) {
 	var zero V
 	var result any
 	refOfItem := reflect.ValueOf(item)
@@ -36,7 +36,7 @@ func Get[V, K comparable](item any, key K) (V, error) {
 			return zero, errors.New("invalid struct field")
 		}
 	case reflect.Pointer:
-		return Get[V, K](refOfItem.Elem().Interface(), key)
+		return AnyGet[V, K](refOfItem.Elem().Interface(), key)
 	default:
 		return zero, errors.New("failed to get")
 	}
@@ -54,7 +54,7 @@ func Pluck[V, K, I comparable](items []I, key K) []V {
 	plucked := make([]V, len(items), cap(items))
 
 	for i, item := range items {
-		if v, err := Get[V](item, key); err == nil {
+		if v, err := AnyGet[V](item, key); err == nil {
 			plucked[i] = v
 		} else {
 			plucked[i] = zero
@@ -82,7 +82,7 @@ func MapPluck[K, V comparable](items []map[K]V, key K) []V {
 func KeyBy[V, K, I comparable](items []I, key K) map[V]I {
 	result := make(map[V]I)
 	for _, item := range items {
-		if v, err := Get[V](item, key); err == nil {
+		if v, err := AnyGet[V](item, key); err == nil {
 			result[v] = item
 		}
 	}
@@ -100,7 +100,7 @@ func MapKeyBy[K, V comparable](items []map[K]V, key K) map[V]map[K]V {
 func GroupBy[V, K, I comparable](items []I, key K) map[V][]I {
 	result := make(map[V][]I)
 	for _, item := range items {
-		if v, err := Get[V](item, key); err == nil {
+		if v, err := AnyGet[V](item, key); err == nil {
 			result[v] = append(result[v], item)
 		}
 	}
