@@ -101,6 +101,9 @@ func TestSlice_Last(t *testing.T) {
 func TestSlice_Index(t *testing.T) {
 	// Integer
 	d1 := []int{1, 2, 3}
+	if v := UseSlice(d1).Index(2); v != 1 {
+		t.Fail()
+	}
 	if v := UseSlice(d1).Index(10); v != -1 {
 		t.Fail()
 	}
@@ -203,42 +206,307 @@ func TestSlice_Map(t *testing.T) {
 	}
 }
 
-// TODO
 func TestSlice_Unique(t *testing.T) {
+	if !UseSlice([]int{1, 2, 2, 3}).Unique().Same([]int{1, 2, 3}) {
+		t.Fail()
+	}
 
+	s1 := []int{1, 2, 3}
+	s2 := []int{4, 5, 6}
+	if !UseSlice([][]int{s1, s2, s1}).Unique().Same([][]int{s1, s2}) {
+		t.Fail()
+	}
+	if !UseSlice([]*[]int{&s1, &s2, &s1}).Unique().Same([]*[]int{&s1, &s2}) {
+		t.Fail()
+	}
+
+	s3 := &[]int{1, 2, 3}
+	s4 := &[]int{4, 5, 6}
+	s5 := (*s4)[:2]
+	if !UseSlice([]*[]int{s3, s4, &s5}).Unique().Same([]*[]int{s3, s4, &s5}) {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Merge(t *testing.T) {
-
+	if !UseSlice([]int{1, 2}).Merge([]int{3, 4}).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2}).Merge([]int{3, 4}, []int{5, 6}).Same([]int{1, 2, 3, 4, 5, 6}) {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Random(t *testing.T) {
-
+	if v, ok := UseSlice([]int{}).Random(); ok || v != 0 {
+		t.Fail()
+	}
+	if v, ok := UseSlice([]int{1}).Random(); !ok || v == 0 {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Reverse(t *testing.T) {
-
+	if !UseSlice([]int{1, 2}).Reverse().Same([]int{2, 1}) {
+		t.Fail()
+	}
+	if UseSlice([]any{}).Reverse().Len() != 0 {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Shuffle(t *testing.T) {
+	if UseSlice([]any{}).Shuffle().Len() != 0 {
+		t.Fail()
+	}
+	if v, ok := UseSlice([]int{1}).Shuffle().First(); !ok || v != 1 {
+		t.Fail()
+	}
 
+	s1 := UseSlice([]int{1, 2}).Shuffle().All()
+	if !UseSlice(s1).Same([]int{1, 2}) && !UseSlice(s1).Same([]int{2, 1}) {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Slice(t *testing.T) {
+	d := []int{1, 2, 3, 4}
 
+	// Normal
+	if !UseSlice(d).Slice(0, 0).Same([]int{}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(0, 2).Same([]int{1, 2}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(2, 2).Same([]int{3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(0, 4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+
+	// Offset out of range
+	if !UseSlice(d).Slice(4, 0).Same([]int{}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(4, 2).Same([]int{}) {
+		t.Fail()
+	}
+
+	// (offset + length) out of range
+	if !UseSlice(d).Slice(3, 2).Same([]int{4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(0, 5).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(0, 100).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+
+	// Negative offset
+	if !UseSlice(d).Slice(-2, 2).Same([]int{3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-4, 2).Same([]int{1, 2}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-4, 4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-4, 5).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-5, 2).Same([]int{}) {
+		t.Fail()
+	}
+
+	// Negative length
+	if !UseSlice(d).Slice(0, -2).Same([]int{}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(0, -10).Same([]int{}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(1, -1).Same([]int{2}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(1, -10).Same([]int{1, 2}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(3, -4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(3, -10).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(4, -10).Same([]int{}) {
+		t.Fail()
+	}
+
+	// Negative offset and length
+	if !UseSlice(d).Slice(-1, -1).Same([]int{4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-1, -2).Same([]int{3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-1, -4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-1, -10).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-3, -1).Same([]int{2}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-3, -10).Same([]int{1, 2}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-4, -1).Same([]int{1}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-4, -10).Same([]int{1}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-5, -1).Same([]int{}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-5, -10).Same([]int{}) {
+		t.Fail()
+	}
+
+	// Pass only offset
+	if !UseSlice(d).Slice(0).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(1).Same([]int{2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(3).Same([]int{4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(4).Same([]int{}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-1).Same([]int{4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-3).Same([]int{2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !UseSlice(d).Slice(-5).Same([]int{}) {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Split(t *testing.T) {
-
+	d := []int{1, 2, 3, 4, 5}
+	if !UseSlice(UseSlice(d).Split(2)).Same([][]int{{1, 2}, {3, 4}, {5}}) {
+		t.Fail()
+	}
 }
 
-// TODO
 func TestSlice_Splice(t *testing.T) {
+	test := func(offset int, args ...any) *SliceCollection[[]int, int] {
+		s := UseSlice([]int{1, 2, 3, 4})
+		chunk := s.Splice(offset, args...)
 
+		s2 := []int{1, 2, 3, 4}
+		var start, end int
+		if len(args) >= 1 {
+			start, end = OffsetToIndex(len(s2), offset, args[0].(int))
+		} else {
+			start, end = OffsetToIndex(len(s2), offset)
+		}
+
+		if !s.Same(append(s2[:start], s2[end:]...)) {
+			t.Fail()
+		}
+
+		return chunk
+	}
+
+	// Normal offset
+	if !test(0).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !test(1).Same([]int{2, 3, 4}) {
+		t.Fail()
+	}
+	if !test(3).Same([]int{4}) {
+		t.Fail()
+	}
+	if !test(4).Same([]int{}) {
+		t.Fail()
+	}
+	if !test(-1).Same([]int{4}) {
+		t.Fail()
+	}
+	if !test(-3).Same([]int{2, 3, 4}) {
+		t.Fail()
+	}
+	if !test(-4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+
+	// Offset out of range
+	if !test(5).Same([]int{}) {
+		t.Fail()
+	}
+	if !test(10).Same([]int{}) {
+		t.Fail()
+	}
+	if !test(-5).Same([]int{}) {
+		t.Fail()
+	}
+
+	// Normal length
+	if !test(0, 1).Same([]int{1}) {
+		t.Fail()
+	}
+	if !test(0, 3).Same([]int{1, 2, 3}) {
+		t.Fail()
+	}
+	if !test(0, 4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !test(3, -4).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+
+	// Length out of range
+	if !test(0, 5).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !test(0, 10).Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+	if !test(0, -1).Same([]int{}) {
+		t.Fail()
+	}
+	if !test(4, -1).Same([]int{}) {
+		t.Fail()
+	}
+	if !test(4, -4).Same([]int{}) {
+		t.Fail()
+	}
+
+	// Replacement
+	s := UseSlice([]int{1, 2, 3, 4})
+	if !s.Splice(1, 2, []int{22, 33}).Same([]int{2, 3}) || !s.Same([]int{1, 22, 33, 4}) {
+		t.Fail()
+	}
+	s = UseSlice([]int{1, 2, 3, 4})
+	if !s.Splice(1, 2, 22, 33).Same([]int{2, 3}) || !s.Same([]int{1, 22, 33, 4}) {
+		t.Fail()
+	}
+	s = UseSlice([]int{1, 2, 3, 4})
+	if !s.Splice(-4, 4, 11, 22, 33, 44).Same([]int{1, 2, 3, 4}) || !s.Same([]int{11, 22, 33, 44}) {
+		t.Fail()
+	}
 }

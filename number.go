@@ -1,15 +1,15 @@
 package collect
 
 import (
-	"constraints"
+	"golang.org/x/exp/constraints"
 )
 
-type numberCollection[T []E, E constraints.Integer | constraints.Float] struct {
-	sliceCollection[T, E]
+type numberCollection[T ~[]E, E constraints.Integer | constraints.Float] struct {
+	*SliceCollection[T, E]
 }
 
-func UseNumber[T []E, E constraints.Integer | constraints.Float](items T) *numberCollection[T, E] {
-	return &numberCollection[T, E]{sliceCollection[T, E]{z: items}}
+func UseNumber[T ~[]E, E constraints.Integer | constraints.Float](items T) *numberCollection[T, E] {
+	return &numberCollection[T, E]{UseSlice[T, E](items)}
 }
 
 func (c *numberCollection[T, E]) Sum() (total E) {

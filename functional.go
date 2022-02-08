@@ -1,7 +1,7 @@
 package collect
 
 import (
-	"constraints"
+	"golang.org/x/exp/constraints"
 	"math"
 	"math/rand"
 	"reflect"
@@ -22,16 +22,16 @@ func Len(v any) int {
 }
 
 func Empty(v any) bool {
-	return reflect.ValueOf(v).Len() == 0
+	return Len(v) == 0
 }
 
-func Each[T []E, E any](items T, callback func(value E, index int)) {
+func Each[T ~[]E, E any](items T, callback func(value E, index int)) {
 	for index, value := range items {
 		callback(value, index)
 	}
 }
 
-func Same[T []E, E any](items, target T) bool {
+func Same[T ~[]E, E any](items, target T) bool {
 	if len(items) != len(target) {
 		return false
 	} else if len(items) == 0 {
@@ -62,7 +62,7 @@ func Same[T []E, E any](items, target T) bool {
 	return true
 }
 
-func First[T []E, E any](items T) (E, bool) {
+func First[T ~[]E, E any](items T) (E, bool) {
 	var value E
 	if len(items) == 0 {
 		return value, false
@@ -72,7 +72,7 @@ func First[T []E, E any](items T) (E, bool) {
 	return value, true
 }
 
-func Last[T []E, E any](items T) (E, bool) {
+func Last[T ~[]E, E any](items T) (E, bool) {
 	var value E
 	if len(items) == 0 {
 		return value, false
@@ -82,23 +82,23 @@ func Last[T []E, E any](items T) (E, bool) {
 	return value, true
 }
 
-func Index[T []E, E any](items T, target E) int {
+func Index[T ~[]E, E any](items T, target E) int {
 	r1 := reflect.ValueOf(target)
 	kind := reflect.TypeOf(items).Elem().Kind()
 
 	for index, item := range items {
 		if kind == reflect.Float64 {
-			if math.Abs(any(item).(float64)-any(item).(float64)) <= 1e-9 {
+			if math.Abs(any(target).(float64)-any(item).(float64)) <= 1e-9 {
 				return index
 			}
 			continue
 		} else if kind == reflect.Float32 {
-			if math.Abs(float64(any(item).(float32))-float64(any(item).(float32))) <= 1e-9 {
+			if math.Abs(float64(any(target).(float32))-float64(any(item).(float32))) <= 1e-9 {
 				return index
 			}
 			continue
 		} else if kind != reflect.Slice {
-			if any(item) == any(item) {
+			if any(target) == any(item) {
 				return index
 			}
 			continue
@@ -117,11 +117,11 @@ func Index[T []E, E any](items T, target E) int {
 	return -1
 }
 
-func Contains[T []E, E any](items T, item E) bool {
+func Contains[T ~[]E, E any](items T, item E) bool {
 	return Index(items, item) != -1
 }
 
-func Diff[T []E, E any](items, target T) T {
+func Diff[T ~[]E, E any](items, target T) T {
 	var different T
 	for _, item := range items {
 		if Index(target, item) == -1 {
@@ -132,7 +132,7 @@ func Diff[T []E, E any](items, target T) T {
 	return different
 }
 
-func Filter[T []E, E any](items T, callback func(value E, index int) bool) T {
+func Filter[T ~[]E, E any](items T, callback func(value E, index int) bool) T {
 	var filtered T
 	for index, item := range items {
 		if callback(item, index) {
@@ -143,7 +143,7 @@ func Filter[T []E, E any](items T, callback func(value E, index int) bool) T {
 	return filtered
 }
 
-func Map[T []E, E any](items T, callback func(value E, index int) E) T {
+func Map[T ~[]E, E any](items T, callback func(value E, index int) E) T {
 	for index, item := range items {
 		items[index] = callback(item, index)
 	}
@@ -151,86 +151,102 @@ func Map[T []E, E any](items T, callback func(value E, index int) E) T {
 	return items
 }
 
-func Unique[T []E, E any](items T) T {
+func Unique[T ~[]E, E any](items T) T {
 	set := make(map[any]struct{})
+	kind := reflect.TypeOf(items).Elem().Kind()
+
 	return Filter(items, func(value E, index int) bool {
-		if _, ok := set[value]; !ok {
-			set[value] = struct{}{}
-			return true
+		switch kind {
+		case reflect.Slice:
+			p := reflect.ValueOf(value).UnsafePointer()
+			if _, ok := set[p]; !ok {
+				set[p] = struct{}{}
+				return true
+			}
+
+		default:
+			if _, ok := set[value]; !ok {
+				set[value] = struct{}{}
+				return true
+			}
 		}
+
 		return false
 	})
 }
 
-func Merge[T []E, E any](items T, targets ...T) T {
+func Merge[T ~[]E, E any](items T, targets ...T) T {
 	for _, target := range targets {
 		items = append(items, target...)
 	}
 	return items
 }
 
-func Random[T []E, E any](items T) E {
+func Random[T ~[]E, E any](items T) (E, bool) {
 	if len(items) == 0 {
-		// TODO: returns false
 		var zero E
-		return zero
+		return zero, false
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	return items[rand.Intn(len(items))]
+	return items[rand.Intn(len(items))], true
 }
 
-func Reverse[T []E, E any](items T) T {
+func Reverse[T ~[]E, E any](items T) T {
 	for i, j := 0, len(items)-1; i < j; i, j = i+1, j-1 {
 		items[i], items[j] = items[j], items[i]
 	}
 	return items
 }
 
-func Shuffle[T []E, E any](items T) T {
+func Shuffle[T ~[]E, E any](items T) T {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(items), func(i, j int) { items[i], items[j] = items[j], items[i] })
 	return items
 }
 
-func Slice[T []E, E any](items T, offset, length int) T {
-	l := len(items)
-	if l == 0 || offset >= l || length == 0 {
-		return items
-	}
-
-	// TODO: negative offset and length
-	if offset+length > l {
-		length = l - offset
-	}
-
-	return items[offset : offset+length]
+func Slice[T ~[]E, E any](items T, offset int, args ...int) T {
+	start, end := OffsetToIndex(len(items), offset, args...)
+	return items[start:end]
 }
 
-func Split[T []E, E any](items T, number int) []T {
-	split := make([]T, int(math.Ceil(float64(len(items))/float64(number))))
+func Split[T ~[]E, E any](items T, amount int) []T {
+	split := make([]T, int(math.Ceil(float64(len(items))/float64(amount))))
 	for i, item := range items {
-		split[i/number] = append(split[i/number], item)
+		split[i/amount] = append(split[i/amount], item)
 	}
 
 	return split
 }
 
-func Splice[T []E, E any](items T, offset, length int) T {
-	l := len(items)
-	if l == 0 || offset >= l || length == 0 {
-		return items
+func Splice[T ~[]E, E any](items T, offset int, args ...any) T {
+	length := len(items)
+	if len(args) >= 1 {
+		length = args[0].(int)
 	}
 
-	// TODO: negative offset and length
-	if offset+length > l {
-		length = l - offset
+	start, end := OffsetToIndex(len(items), offset, length)
+	replica := make(T, start)
+	copy(replica, items[:start])
+
+	if len(args) < 2 {
+		return append(replica, items[end:]...)
 	}
 
-	return append(items[:offset], items[offset+length:]...)
+	for _, rep := range args[1:] {
+		switch v := rep.(type) {
+		case E:
+			replica = append(replica, v)
+		case T:
+			replica = append(replica, v...)
+		default:
+			panic("replacement type error")
+		}
+	}
+	return append(replica, items[end:]...)
 }
 
-func Count[T []E, E comparable](items T) map[E]int {
+func Count[T ~[]E, E comparable](items T) map[E]int {
 	times := make(map[E]int)
 	for _, item := range items {
 		times[item]++
@@ -243,14 +259,14 @@ func Count[T []E, E comparable](items T) map[E]int {
  * Number slice
  */
 
-func Sum[T []E, E constraints.Integer | constraints.Float](items T) (total E) {
+func Sum[T ~[]E, E constraints.Integer | constraints.Float](items T) (total E) {
 	for _, value := range items {
 		total += value
 	}
 	return
 }
 
-func Avg[T []E, E constraints.Integer | constraints.Float](items T) E {
+func Avg[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
 	if len(items) == 0 {
 		return 0
 	}
@@ -258,7 +274,7 @@ func Avg[T []E, E constraints.Integer | constraints.Float](items T) E {
 	return Sum[T, E](items) / E(len(items))
 }
 
-func Min[T []E, E constraints.Integer | constraints.Float](items T) E {
+func Min[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
 	if len(items) == 0 {
 		return 0
 	}
@@ -273,7 +289,7 @@ func Min[T []E, E constraints.Integer | constraints.Float](items T) E {
 	return min
 }
 
-func Max[T []E, E constraints.Integer | constraints.Float](items T) E {
+func Max[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
 	if len(items) == 0 {
 		return 0
 	}
@@ -292,7 +308,7 @@ func Max[T []E, E constraints.Integer | constraints.Float](items T) E {
  * Map
  */
 
-func Only[T map[K]V, K comparable, V any](items T, keys ...K) T {
+func Only[T ~map[K]V, K comparable, V any](items T, keys ...K) T {
 	m := make(T)
 	for _, key := range keys {
 		m[key] = items[key]
@@ -301,22 +317,29 @@ func Only[T map[K]V, K comparable, V any](items T, keys ...K) T {
 	return m
 }
 
-func Except[T map[K]V, K comparable, V any](items T, keys ...K) T {
+func Except[T ~map[K]V, K comparable, V any](items T, keys ...K) T {
+	keysMap := map[K]struct{}{}
 	for _, key := range keys {
-		delete(items, key)
+		keysMap[key] = struct{}{}
 	}
 
-	return items
+	m := make(T)
+	for key, value := range items {
+		if _, ok := keysMap[key]; !ok {
+			m[key] = value
+		}
+	}
+	return m
 }
 
-func Keys[T map[K]V, K comparable, V any](items T) (keys []K) {
+func Keys[T ~map[K]V, K comparable, V any](items T) (keys []K) {
 	for key := range items {
 		keys = append(keys, key)
 	}
 	return
 }
 
-func DiffKeys[T map[K]V, K comparable, V any](items T, target T) T {
+func DiffKeys[T ~map[K]V, K comparable, V any](items T, target T) T {
 	m := make(T)
 	for key := range items {
 		if _, ok := target[key]; !ok {
@@ -327,7 +350,7 @@ func DiffKeys[T map[K]V, K comparable, V any](items T, target T) T {
 	return m
 }
 
-func Has[T map[K]V, K comparable, V any](items T, key K) bool {
+func Has[T ~map[K]V, K comparable, V any](items T, key K) bool {
 	if _, ok := items[key]; ok {
 		return true
 	} else {
@@ -335,12 +358,12 @@ func Has[T map[K]V, K comparable, V any](items T, key K) bool {
 	}
 }
 
-func Set[T map[K]V, K comparable, V any](items T, key K, value V) T {
+func Set[T ~map[K]V, K comparable, V any](items T, key K, value V) T {
 	items[key] = value
 	return items
 }
 
-func Get[T map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
+func Get[T ~map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
 	if !Has[T, K, V](items, key) {
 		return
 	}
@@ -348,7 +371,43 @@ func Get[T map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
 	return items[key], true
 }
 
-func MapMerge[T map[K]V, K comparable, V any](items T, targets ...T) T {
+func MapSame[T ~map[K]V, K comparable, V any](items, target T) bool {
+	if len(items) != len(target) {
+		return false
+	} else if len(items) == 0 {
+		return true
+	}
+
+	kind := reflect.TypeOf(items).Elem().Kind()
+	if kind == reflect.Slice {
+		return reflect.DeepEqual(items, target)
+	}
+
+	for index, item := range items {
+		tv, ok := target[index]
+		if !ok {
+			return false
+		}
+
+		switch kind {
+		case reflect.Float32:
+			if math.Abs(float64(any(item).(float32))-float64(any(tv).(float32))) > 1e-9 {
+				return false
+			}
+		case reflect.Float64:
+			if math.Abs(any(item).(float64)-any(tv).(float64)) > 1e-9 {
+				return false
+			}
+		default:
+			if any(item) != any(tv) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func MapMerge[T ~map[K]V, K comparable, V any](items T, targets ...T) T {
 	for _, target := range targets {
 		for key, value := range target {
 			items[key] = value
@@ -357,6 +416,11 @@ func MapMerge[T map[K]V, K comparable, V any](items T, targets ...T) T {
 	return items
 }
 
-// TODO
-//func Union[T map[K]V, K comparable, V any](items T) T {
-//}
+func Union[T ~map[K]V, K comparable, V any](items T, target T) T {
+	for key, value := range target {
+		if _, ok := items[key]; !ok {
+			items[key] = value
+		}
+	}
+	return items
+}

@@ -2,6 +2,7 @@ package tests
 
 import (
 	"encoding/json"
+	"fmt"
 	. "github.com/sxyazi/go-collection"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestGet(t *testing.T) {
 
 	// Slice
 	users := []*User{&user}
-	if _, err := AnyGet[interface{}](users, 0); err != nil {
+	if _, err := AnyGet[any](users, 0); err != nil {
 		t.Fail()
 	}
 	if v, err := AnyGet[*User](users, 0); err != nil || v != &user {
@@ -37,8 +38,8 @@ func TestGet(t *testing.T) {
 	}
 
 	// Interface
-	var i interface{}
-	if _, err := AnyGet[interface{}](i, ""); err == nil {
+	var i any
+	if _, err := AnyGet[any](i, ""); err == nil {
 		t.Fail()
 	}
 
@@ -79,12 +80,13 @@ func TestMapPluck(t *testing.T) {
 }
 
 func TestKeyBy(t *testing.T) {
-	users := []User{{ID: 33, Name: "Lucy"}, {ID: 193, Name: "Peter"}}
-	r2 := KeyBy[uint](users, "ID")
-	if len(r2) != 2 {
+	users := []User{{ID: 33, Name: "Lucy"}, {ID: 193, Name: "Peter"}, {ID: 194, Name: "Peter"}}
+	r := KeyBy[string](users, "Name")
+	fmt.Println(r)
+	if len(r) != 2 {
 		t.Fail()
 	}
-	if r2[33].Name != "Lucy" || r2[193].Name != "Peter" {
+	if r["Lucy"].ID != 33 || r["Peter"].ID != 194 {
 		t.Fail()
 	}
 }

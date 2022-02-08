@@ -1,14 +1,15 @@
 package collect
 
 import (
-	"constraints"
 	"errors"
 	"fmt"
+	"golang.org/x/exp/constraints"
+	"math"
 	"strconv"
 )
 
 func StringToNumber[T constraints.Integer | constraints.Float](s string) (result T, _ error) {
-	switch interface{}(result).(type) {
+	switch any(result).(type) {
 	// Signed
 	case int:
 		n, err := strconv.Atoi(s)
@@ -57,7 +58,35 @@ func StringToNumber[T constraints.Integer | constraints.Float](s string) (result
 	return
 }
 
-func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](c *sliceCollection[T, E]) *numberCollection[[]N, N] {
+func OffsetToIndex(actual, offset int, args ...int) (int, int) {
+	length := actual
+	if len(args) >= 1 {
+		length = args[0]
+	}
+
+	if actual == 0 {
+		return 0, 0
+	} else if length == 0 || offset >= actual || offset < -actual || (offset == 0 && length < 0) {
+		return 0, 0
+	}
+
+	// negative offset and length
+	if offset < 0 {
+		offset = actual + offset
+	}
+	if length < 0 {
+		if offset+length < 0 {
+			offset, length = 0, offset+1
+		} else {
+			offset, length = offset+length+1, -length
+		}
+	}
+
+	length = int(math.Min(float64(length), float64(actual-offset)))
+	return offset, offset + length
+}
+
+func NumberFrom[N constraints.Integer | constraints.Float, T ~[]E, E comparable](c *SliceCollection[T, E]) *numberCollection[[]N, N] {
 	if c.Empty() {
 		return &numberCollection[[]N, N]{}
 	}
@@ -73,5 +102,5 @@ func NumberFrom[N constraints.Integer | constraints.Float, T []E, E comparable](
 		}
 	}
 
-	return &numberCollection[[]N, N]{sliceCollection[[]N, N]{z: items}}
+	return UseNumber[[]N, N](items)
 }

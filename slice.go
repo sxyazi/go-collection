@@ -4,105 +4,116 @@ import (
 	"fmt"
 )
 
-type sliceCollection[T []E, E any] struct {
+type SliceCollection[T ~[]E, E any] struct {
 	z any
 }
 
-func UseSlice[T []E, E any](items T) *sliceCollection[T, E] {
-	return &sliceCollection[T, E]{z: items}
+func UseSlice[T ~[]E, E any](items T) *SliceCollection[T, E] {
+	return &SliceCollection[T, E]{items}
 }
 
-func (c *sliceCollection[T, E]) All() T {
-	return c.z.(T)
+func (s *SliceCollection[T, E]) All() T {
+	return s.z.(T)
 }
 
-func (c *sliceCollection[T, E]) Len() int {
-	return len(c.z.(T))
+func (s *SliceCollection[T, E]) New(items T) *SliceCollection[T, E] {
+	return &SliceCollection[T, E]{items}
 }
 
-func (c *sliceCollection[T, E]) Empty() bool {
-	return len(c.z.(T)) == 0
+func (s *SliceCollection[T, E]) Len() int {
+	return len(s.z.(T))
 }
 
-func (c *sliceCollection[T, E]) Print() *sliceCollection[T, E] {
-	fmt.Println(c.z)
-	return c
+func (s *SliceCollection[T, E]) Empty() bool {
+	return len(s.z.(T)) == 0
 }
 
-func (c *sliceCollection[T, E]) Each(callback func(value E, index int)) *sliceCollection[T, E] {
-	Each(c.All(), callback)
-	return c
+func (s *SliceCollection[T, E]) Print() *SliceCollection[T, E] {
+	fmt.Println(s.z)
+	return s
 }
 
-func (c *sliceCollection[T, E]) Same(target T) bool {
-	return Same[T, E](c.All(), target)
+func (s *SliceCollection[T, E]) Each(callback func(value E, index int)) *SliceCollection[T, E] {
+	Each[T, E](s.All(), callback)
+	return s
 }
 
-func (c *sliceCollection[T, E]) First() (E, bool) {
-	return First[T, E](c.All())
+func (s *SliceCollection[T, E]) Same(target T) bool {
+	return Same[T, E](s.All(), target)
 }
 
-func (c *sliceCollection[T, E]) Last() (E, bool) {
-	return Last[T, E](c.All())
+func (s *SliceCollection[T, E]) First() (E, bool) {
+	return First[T, E](s.All())
 }
 
-func (c *sliceCollection[T, E]) Index(value E) int {
-	return Index(c.All(), value)
+func (s *SliceCollection[T, E]) Last() (E, bool) {
+	return Last[T, E](s.All())
 }
 
-func (c *sliceCollection[T, E]) Contains(value E) bool {
-	return Contains(c.All(), value)
+func (s *SliceCollection[T, E]) Index(value E) int {
+	return Index(s.All(), value)
 }
 
-func (c *sliceCollection[T, E]) Diff(target T) *sliceCollection[T, E] {
-	c.z = Diff[T, E](c.All(), target)
-	return c
+func (s *SliceCollection[T, E]) Contains(value E) bool {
+	return Contains(s.All(), value)
 }
 
-func (c *sliceCollection[T, E]) Filter(callback func(value E, index int) bool) *sliceCollection[T, E] {
-	c.z = Filter(c.All(), callback)
-	return c
+func (s *SliceCollection[T, E]) Diff(target T) *SliceCollection[T, E] {
+	s.z = Diff[T, E](s.All(), target)
+	return s
 }
 
-func (c *sliceCollection[T, E]) Map(callback func(value E, index int) E) *sliceCollection[T, E] {
-	c.z = Map(c.All(), callback)
-	return c
+func (s *SliceCollection[T, E]) Filter(callback func(value E, index int) bool) *SliceCollection[T, E] {
+	s.z = Filter(s.All(), callback)
+	return s
 }
 
-func (c *sliceCollection[T, E]) Unique() *sliceCollection[T, E] {
-	c.z = Unique[T, E](c.All())
-	return c
+func (s *SliceCollection[T, E]) Map(callback func(value E, index int) E) *SliceCollection[T, E] {
+	s.z = Map(s.All(), callback)
+	return s
 }
 
-func (c *sliceCollection[T, E]) Merge(targets ...T) *sliceCollection[T, E] {
-	c.z = Merge[T, E](c.All(), targets...)
-	return c
+func (s *SliceCollection[T, E]) Unique() *SliceCollection[T, E] {
+	s.z = Unique[T, E](s.All())
+	return s
 }
 
-func (c *sliceCollection[T, E]) Random() E {
-	return Random[T, E](c.All())
+func (s *SliceCollection[T, E]) Merge(targets ...T) *SliceCollection[T, E] {
+	s.z = Merge[T, E](s.All(), targets...)
+	return s
 }
 
-func (c *sliceCollection[T, E]) Reverse() *sliceCollection[T, E] {
-	c.z = Reverse[T, E](c.All())
-	return c
+func (s *SliceCollection[T, E]) Random() (E, bool) {
+	return Random[T, E](s.All())
 }
 
-func (c *sliceCollection[T, E]) Shuffle() *sliceCollection[T, E] {
-	c.z = Shuffle[T, E](c.All())
-	return c
+func (s *SliceCollection[T, E]) Reverse() *SliceCollection[T, E] {
+	s.z = Reverse[T, E](s.All())
+	return s
 }
 
-func (c *sliceCollection[T, E]) Slice(offset, length int) *sliceCollection[T, E] {
-	c.z = Slice[T, E](c.All(), offset, length)
-	return c
+func (s *SliceCollection[T, E]) Shuffle() *SliceCollection[T, E] {
+	s.z = Shuffle[T, E](s.All())
+	return s
 }
 
-func (c *sliceCollection[T, E]) Split(number int) *bareCollection[[]T, T] {
-	return &bareCollection[[]T, T]{z: Split[T, E](c.All(), number)}
+func (s *SliceCollection[T, E]) Slice(offset int, length ...int) *SliceCollection[T, E] {
+	s.z = Slice[T, E](s.All(), offset, length...)
+	return s
 }
 
-func (c *sliceCollection[T, E]) Splice(offset, length int) *sliceCollection[T, E] {
-	c.z = Splice[T, E](c.All(), offset, length)
-	return c
+func (s *SliceCollection[T, E]) Split(amount int) []T {
+	return Split[T, E](s.All(), amount)
+}
+
+func (s *SliceCollection[T, E]) Splice(offset int, args ...any) *SliceCollection[T, E] {
+	var remaining T
+	if len(args) >= 1 {
+		remaining = Slice[T, E](s.All(), offset, args[0].(int))
+	} else {
+		remaining = Slice[T, E](s.All(), offset)
+	}
+
+	s.z = Splice[T, E](s.All(), offset, args...)
+	return s.New(remaining)
 }
