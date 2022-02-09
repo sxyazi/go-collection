@@ -2,7 +2,7 @@
 
 English | [简体中文](README_zh-CN.md)
 
-`go-collection` provides developers with a convenient set of functions for working with common slices, dicts, and arrays data. These functions are based on the generic types of Go 1.18, which makes it easier to use them without annoying type assertions. In addition to using these functions directly, it also supports method chaining.
+`go-collection` provides developers with a convenient set of functions for working with common slices, maps, and arrays data. These functions are based on the generic types of Go 1.18, which makes it easier to use them without annoying type assertions. In addition to using these functions directly, it also supports method chaining.
 
 ```go
 collect.Reduce(collect.Filter(collect.Map([]int{1, 2, 3}, fn), fn), fn)
@@ -34,7 +34,7 @@ Its API is very simple and if you have used other similar packages, you should b
 
 The corresponding chained function is `collect.UseSlice()`
 
-- Len: Gets the length of the slice
+- `Len` gets the length of the slice
 
   <details>
   <summary>Examples</summary>
@@ -49,7 +49,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Each: Iterates over each element in the slice
+- `Each` iterates over each element in the slice
 
   <details>
   <summary>Examples</summary>
@@ -63,7 +63,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Empty: Checks if the slice is empty
+- `Empty` checks if the slice is empty
 
   <details>
   <summary>Examples</summary>
@@ -75,7 +75,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Same: Checks if the contents of two slices are the same
+- `Same` checks if the contents of two slices are the same
 
   <details>
   <summary>Examples</summary>
@@ -92,7 +92,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- First: Gets the first element of the slice
+- `First` gets the first element of the slice
 
   <details>
   <summary>Examples</summary>
@@ -107,7 +107,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Last: Gets the last element of the slice
+- `Last` gets the last element of the slice
 
   <details>
   <summary>Examples</summary>
@@ -122,7 +122,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Index: Gets the index of the specified element in the slice, and returns -1 if it does not exist.
+- `Index` gets the index of the specified element in the slice, and returns -1 if it does not exist.
 
   <details>
   <summary>Examples</summary>
@@ -138,7 +138,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Contains: Checks if the slice contains the specified element
+- `Contains` checks if the slice contains the specified element
 
   <details>
   <summary>Examples</summary>
@@ -154,7 +154,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Diff: Computes the difference set of two slices
+- `Diff` computes the difference set of two slices
 
   <details>
   <summary>Examples</summary>
@@ -166,7 +166,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Filter: Filters the elements in the slice
+- `Filter` filters the elements in the slice
 
   <details>
   <summary>Examples</summary>
@@ -179,7 +179,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Map: Iterates over and sets the value of the elements in the slice
+- `Map` iterates over and sets the value of the elements in the slice
 
   <details>
   <summary>Examples</summary>
@@ -192,7 +192,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Unique: Removes duplicate elements from slices
+- `Unique` removes duplicate elements from slices
 
   <details>
   <summary>Examples</summary>
@@ -204,7 +204,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Merge: Merges the current slice with other slices
+- `Merge` merges the current slice with other slices
 
   <details>
   <summary>Examples</summary>
@@ -220,7 +220,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Random: Gets an element of the slice at random
+- `Random` gets an element of the slice at random
 
   <details>
   <summary>Examples</summary>
@@ -235,7 +235,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Reverse: Reverses the elements in a slice
+- `Reverse` reverses the elements in a slice
 
   <details>
   <summary>Examples</summary>
@@ -247,7 +247,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Shuffle: Randomly shuffles the elements in a slice
+- `Shuffle` randomly shuffles the elements in a slice
 
   <details>
   <summary>Examples</summary>
@@ -259,7 +259,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Slice: Takes a segment from a slice
+- `Slice` takes a segment from a slice
 
   <details>
   <summary>Examples</summary>
@@ -280,7 +280,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Split: Splits a slice into multiple slices by the specified amount
+- `Split` splits a slice into multiple slices by the specified amount
 
   <details>
   <summary>Examples</summary>
@@ -292,7 +292,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- Splice: Removes a segment from the slice
+- `Splice` removes a segment from the slice
 
   <details>
   <summary>Examples</summary>
@@ -311,7 +311,7 @@ The corresponding chained function is `collect.UseSlice()`
   collect.Splice(d, 2, 2)  // []int{1, 2, 5}
   ```
 
-  Function signature: `Slice(items T, offset, length int, replacements ...T|E)`
+  Function signature: `Splice(items T, offset, length int, replacements ...T|E)`
 
   ```go
   d := []int{1, 2, 3, 4}
@@ -320,9 +320,21 @@ The corresponding chained function is `collect.UseSlice()`
   collect.Splice(d, 1, 2, []int{22}, 33, []int{44})  // []int{1, 22, 33, 44, 4}
   ```
 
+  It is worth noting that the `Splice` method in the chain differs from the above in that it returns the deleted elements, and the result of the deletion occurs on the original collection:
+
+  ```go
+  c1 := collect.UseSlice([]int{1, 2, 3, 4})
+  c1.Splice(2)  // []int{3, 4}
+  c1.All()      // []int{1, 2}
+
+  c2 := collect.UseSlice([]int{1, 2, 3, 4})
+  c2.Splice(1, 2, []int{22, 33})  // []int{2, 3}
+  c2.All()                        // []int{1, 22, 33, 4}
+  ```
+
   </details>
 
-- Count: Counts the number of occurrences of each element in the slice
+- `Count` counts the number of occurrences of each element in the slice
 
   <details>
   <summary>Examples</summary>
@@ -346,11 +358,11 @@ collect.Len(arr[:])
 collect.UseSlice(arr[:]).Len()
 ```
 
-### Dict
+### Map
 
 The corresponding chained function is `collect.UseMap()`
 
-- Only: Gets the elements of the dict with the specified keys
+- `Only` gets the elements of the map with the specified keys
 
   <details>
   <summary>Examples</summary>
@@ -363,7 +375,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Except: Gets the elements of the dict with the specified keys removed
+- `Except` gets the elements of the map with the specified keys removed
 
   <details>
   <summary>Examples</summary>
@@ -376,7 +388,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Keys: Gets all the keys in the dict
+- `Keys` gets all the keys in the map
 
   <details>
   <summary>Examples</summary>
@@ -388,7 +400,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- DiffKeys: Compares with the given collection and returns the key/value pairs in the given collection that do not exist in the original collection
+- `DiffKeys` compares with the given collection and returns the key/value pairs in the given collection that do not exist in the original collection
 
   <details>
   <summary>Examples</summary>
@@ -402,7 +414,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Has: Checks if the dict contains the specified key
+- `Has` checks if the map contains the specified key
 
   <details>
   <summary>Examples</summary>
@@ -414,7 +426,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Set: Sets the value of the specified key in the dict
+- `Set` sets the value of the specified key in the map
 
   <details>
   <summary>Examples</summary>
@@ -426,7 +438,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Get: Gets the value of the specified key in the dict
+- `Get` gets the value of the specified key in the map
 
   <details>
   <summary>Examples</summary>
@@ -440,7 +452,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Merge: Merges the current dict with other dicts
+- `Merge` merges the current map with other maps
 
   <details>
   <summary>Examples</summary>
@@ -459,7 +471,7 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- Union: Unites the current dict with other dicts, and the items in the original dict are given priority
+- `Union` unites the current map with other maps, and the items in the original map are given priority
 
   <details>
   <summary>Examples</summary>
@@ -476,7 +488,7 @@ The corresponding chained function is `collect.UseMap()`
 
 The corresponding chained function is `collect.UseNumber()`，which is a subset of [slice](#Slice) and includes, in addition to all the methods of slice, the additional:
 
-- Sum: Calculates the sum
+- `Sum` calculates the sum
 
   <details>
   <summary>Examples</summary>
@@ -487,7 +499,7 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
 
   </details>
 
-- Avg: Calculates the average
+- `Avg` calculates the average
 
   <details>
   <summary>Examples</summary>
@@ -498,7 +510,7 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
 
   </details>
 
-- Min: Calculates the minimum value
+- `Min` calculates the minimum value
 
   <details>
   <summary>Examples</summary>
@@ -509,7 +521,7 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
 
   </details>
 
-- Max: Calculates the maximum value
+- `Max` calculates the maximum value
 
   <details>
   <summary>Examples</summary>
@@ -524,7 +536,7 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
 
 Due to Golang's support for generics, it is [not possible to define generic types in methods](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md#no-parameterized-methods), so only their function implementations (which do not support chain calls) are listed below:
 
-- AnyGet: Gets value of arbitrary types (slices, dicts, arrays, structures, and pointers to these) in a non-strict form
+- `AnyGet` gets value of arbitrary types (slices, maps, arrays, structures, and pointers to these) in a non-strict form
 
   <details>
   <summary>Examples</summary>
@@ -542,7 +554,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- Pluck: Retrieves all values for a given key and supports all values supported by `AnyGet`
+- `Pluck` retrieves all values for a given key. supports all values supported by `AnyGet`
 
   <details>
   <summary>Examples</summary>
@@ -554,7 +566,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- MapPluck: Retrieves all values of a given key, only dicts are supported
+- `MapPluck` retrieves all values of a given key, only maps are supported
 
   <details>
   <summary>Examples</summary>
@@ -566,7 +578,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- KeyBy: Retrieves a collection with the value of the given key as the identifier (if there are duplicate keys, only the last one will be kept). Supports all values supported by `AnyGet`
+- `KeyBy` retrieves a collection with the value of the given key as the identifier (if there are duplicate keys, only the last one will be kept). Supports all values supported by `AnyGet`
 
   <details>
   <summary>Examples</summary>
@@ -578,7 +590,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- MapKeyBy: Retrieves the set with the value of the given key as the identifier (if there are duplicate keys, only the last one will be kept), only dicts are supported
+- `MapKeyBy` retrieves the set with the value of the given key as the identifier (if there are duplicate keys, only the last one will be kept), only maps are supported
 
   <details>
   <summary>Examples</summary>
@@ -590,7 +602,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- GroupBy: Groups the items in a collection using the value of the given key as the identifier. Supports all values supported by `AnyGet`
+- `GroupBy` groups the items in a collection using the value of the given key as the identifier. Supports all values supported by `AnyGet`
 
   <details>
   <summary>Examples</summary>
@@ -602,7 +614,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- MapGroupBy: Groups items in a collection using the value of the given key as the identifier, only dicts are supported
+- `MapGroupBy` groups items in a collection using the value of the given key as the identifier, only maps are supported
 
   <details>
   <summary>Examples</summary>

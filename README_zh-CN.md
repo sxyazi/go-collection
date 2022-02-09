@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-`go-collection` 向开发者提供了一组便利的函数，用于处理常见的切片、字典、数组数据。这些函数基于 Go 1.18 中的泛型实现，这让在使用时更加方便，而无需烦人的类型断言。除了直接使用这些函数外，它同样支持链式调用。
+`go-collection` 向开发者提供了一组便利的函数，用于处理常见的切片、映射、数组数据。这些函数基于 Go 1.18 中的泛型实现，这让在使用时更加方便，而无需烦人的类型断言。除了直接使用这些函数外，它同样支持链式调用。
 
 ```go
 collect.Reduce(collect.Filter(collect.Map([]int{1, 2, 3}, fn), fn), fn)
@@ -264,14 +264,14 @@ import collect "github.com/sxyazi/go-collection"
   <details>
   <summary>例子</summary>
 
-  Function signature: `Slice(items T, offset int)`
+  函数签名：`Slice(items T, offset int)`
 
   ```go
   d := []int{1, 2, 3, 4}
   collect.Slice(d, 2)  // []int{3, 4}
   ```
 
-  Function signature: `Slice(items T, offset, length int)`
+  函数签名：`Slice(items T, offset, length int)`
 
   ```go
   collect.Slice(d, 0, 2)  // []int{1, 2}
@@ -297,27 +297,39 @@ import collect "github.com/sxyazi/go-collection"
   <details>
   <summary>例子</summary>
 
-  Function signature: `Splice(items T, offset int)`
+  函数签名：`Splice(items T, offset int)`
 
   ```go
   d := []int{1, 2, 3, 4, 5}
   collect.Splice(d, 2)  // []int{1, 2}
   ```
 
-  Function signature: `Splice(items T, offset, length int)`
+  函数签名：`Splice(items T, offset, length int)`
 
   ```go
   d := []int{1, 2, 3, 4, 5}
   collect.Splice(d, 2, 2)  // []int{1, 2, 5}
   ```
 
-  Function signature: `Slice(items T, offset, length int, replacements ...T|E)`
+  函数签名：`Splice(items T, offset, length int, replacements ...T|E)`
 
   ```go
   d := []int{1, 2, 3, 4}
   collect.Splice(d, 1, 2, []int{22, 33})             // []int{1, 22, 33, 4}
   collect.Splice(d, 1, 2, 233, 333)                  // []int{1, 222, 333, 4}
   collect.Splice(d, 1, 2, []int{22}, 33, []int{44})  // []int{1, 22, 33, 44, 4}
+  ```
+
+  值得注意的是，链式中的 `Splice` 方法与上述不同，它返回的是被删除的元素，而删除后的结果发生在原始集合上：
+
+  ```go
+  c1 := collect.UseSlice([]int{1, 2, 3, 4})
+  c1.Splice(2)  // []int{3, 4}
+  c1.All()      // []int{1, 2}
+
+  c2 := collect.UseSlice([]int{1, 2, 3, 4})
+  c2.Splice(1, 2, []int{22, 33})  // []int{2, 3}
+  c2.All()                        // []int{1, 22, 33, 4}
   ```
 
   </details>
@@ -346,11 +358,11 @@ collect.Len(arr[:])
 collect.UseSlice(arr[:]).Len()
 ```
 
-### 字典
+### 映射
 
 对应的链式函数为 `collect.UseMap()`
 
-- Only：获取字典中指定键的元素
+- Only：获取映射中指定键的元素
 
   <details>
   <summary>例子</summary>
@@ -363,7 +375,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Except：获取字典中除去指定键的元素
+- Except：获取映射中除去指定键的元素
 
   <details>
   <summary>例子</summary>
@@ -376,7 +388,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Keys：获取字典中所有的键
+- Keys：获取映射中所有的键
 
   <details>
   <summary>例子</summary>
@@ -402,7 +414,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Has：检查字典中是否包含指定键
+- Has：检查映射中是否包含指定键
 
   <details>
   <summary>例子</summary>
@@ -414,7 +426,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Set：设置字典中指定键的值
+- Set：设置映射中指定键的值
 
   <details>
   <summary>例子</summary>
@@ -426,7 +438,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Get：获取字典中指定键的值
+- Get：获取映射中指定键的值
 
   <details>
   <summary>例子</summary>
@@ -440,7 +452,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Merge：将当前字典与其它字典合并
+- Merge：将当前映射与其它映射合并
 
   <details>
   <summary>例子</summary>
@@ -459,7 +471,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Union：将当前字典与其它字典联合，原字典中的项目会被优先考虑
+- Union：将当前映射与其它映射联合，原映射中的项目会被优先考虑
 
   <details>
   <summary>例子</summary>
@@ -524,7 +536,7 @@ collect.UseSlice(arr[:]).Len()
 
 受限于 [Golang 泛型](https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md#no-parameterized-methods) 的支持，无法在方法中定义泛型类型，因此以下列出的这些只有其函数实现（不支持链式调用）：
 
-- AnyGet：以一种非严格的形式获取任意类型（切片、字典、数组、结构体，以及这些的指针）中的值
+- AnyGet：以一种非严格的形式获取任意类型（切片、映射、数组、结构体，以及这些的指针）中的值
 
   <details>
   <summary>例子</summary>
@@ -554,7 +566,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- MapPluck：检索给定键的所有值，只支持字典
+- MapPluck：检索给定键的所有值，只支持映射
 
   <details>
   <summary>例子</summary>
@@ -578,7 +590,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- MapKeyBy：以给定键的值为标识检索集合（若存在重复的键，则只有最后一个会被保留），只支持字典
+- MapKeyBy：以给定键的值为标识检索集合（若存在重复的键，则只有最后一个会被保留），只支持映射
 
   <details>
   <summary>例子</summary>
@@ -602,7 +614,7 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- MapGroupBy：以给定键的值为标识，对集合中的项目分组，只支持字典
+- MapGroupBy：以给定键的值为标识，对集合中的项目分组，只支持映射
 
   <details>
   <summary>例子</summary>
