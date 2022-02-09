@@ -2,6 +2,7 @@ package tests
 
 import (
 	. "github.com/sxyazi/go-collection"
+	"strconv"
 	"testing"
 )
 
@@ -46,6 +47,22 @@ func TestFunctional_Empty(t *testing.T) {
 func TestFunctional_Count(t *testing.T) {
 	m := Count([]int{1, 2, 2, 3})
 	if m[1] != 1 || m[2] != 2 || m[3] != 1 {
+		t.Fail()
+	}
+}
+
+func TestFunctional_Times(t *testing.T) {
+	if !Times(3, func(number int) float64 {
+		return float64(number) * 3.14
+	}).Same([]float64{3.14, 6.28, 9.42}) {
+		t.Fail()
+	}
+}
+
+func TestFunctional_SortBy(t *testing.T) {
+	if !SortBy([]int{2, 1, 3}, func(item, index int) string {
+		return strconv.Itoa(item)
+	}).Same([]int{1, 2, 3}) {
 		t.Fail()
 	}
 }

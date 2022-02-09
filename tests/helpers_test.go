@@ -2,7 +2,6 @@ package tests
 
 import (
 	"encoding/json"
-	"fmt"
 	. "github.com/sxyazi/go-collection"
 	"testing"
 )
@@ -82,7 +81,6 @@ func TestMapPluck(t *testing.T) {
 func TestKeyBy(t *testing.T) {
 	users := []User{{ID: 33, Name: "Lucy"}, {ID: 193, Name: "Peter"}, {ID: 194, Name: "Peter"}}
 	r := KeyBy[string](users, "Name")
-	fmt.Println(r)
 	if len(r) != 2 {
 		t.Fail()
 	}

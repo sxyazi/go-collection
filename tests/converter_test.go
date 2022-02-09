@@ -17,7 +17,7 @@ func TestNumberFrom(t *testing.T) {
 	}
 
 	c2 := UseSlice([]int32{392, 68, 27, 0})
-	if NumberFrom[uint](c2).Avg() != 121 {
+	if NumberFrom[uint](c2).Avg() != 121.75 {
 		t.Fail()
 	}
 

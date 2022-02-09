@@ -1,29 +1,18 @@
 package collect
 
 import (
+	"github.com/sxyazi/go-collection/types"
 	"golang.org/x/exp/constraints"
 	"math"
 	"math/rand"
 	"reflect"
+	"sort"
 	"time"
 )
 
 /**
  * Any slice
  */
-
-func Len(v any) int {
-	switch reflect.TypeOf(v).Kind() {
-	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice, reflect.String:
-		return reflect.ValueOf(v).Len()
-	default:
-		return -1
-	}
-}
-
-func Empty(v any) bool {
-	return Len(v) == 0
-}
 
 func Each[T ~[]E, E any](items T, callback func(value E, index int)) {
 	for index, value := range items {
@@ -246,13 +235,12 @@ func Splice[T ~[]E, E any](items T, offset int, args ...any) T {
 	return append(replica, items[end:]...)
 }
 
-func Count[T ~[]E, E comparable](items T) map[E]int {
-	times := make(map[E]int)
-	for _, item := range items {
-		times[item]++
+func Reduce[T ~[]E, E any](items T, initial E, callback func(carry E, value E, key int) E) E {
+	for key, value := range items {
+		initial = callback(initial, value, key)
 	}
 
-	return times
+	return initial
 }
 
 /**
@@ -264,14 +252,6 @@ func Sum[T ~[]E, E constraints.Integer | constraints.Float](items T) (total E) {
 		total += value
 	}
 	return
-}
-
-func Avg[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
-	if len(items) == 0 {
-		return 0
-	}
-
-	return Sum[T, E](items) / E(len(items))
 }
 
 func Min[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
@@ -302,6 +282,36 @@ func Max[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
 	}
 
 	return max
+}
+
+func Sort[T ~[]E, E constraints.Ordered](items T) T {
+	sort.Sort(&types.SortableSlice[T, E]{items})
+	return items
+}
+
+func Avg[T ~[]E, E constraints.Integer | constraints.Float](items T) float64 {
+	if len(items) == 0 {
+		return 0
+	}
+
+	return float64(Sum[T, E](items)) / float64(len(items))
+}
+
+func Median[T ~[]E, E constraints.Integer | constraints.Float](items T) float64 {
+	if len(items) == 0 {
+		return 0
+	}
+
+	replica := make(T, len(items))
+	copy(replica, items)
+	Sort[T, E](replica)
+
+	half := len(replica) / 2
+	if len(replica)%2 != 0 {
+		return float64(replica[half])
+	}
+
+	return float64(replica[half-1]+replica[half]) / 2
 }
 
 /**
@@ -423,4 +433,56 @@ func Union[T ~map[K]V, K comparable, V any](items T, target T) T {
 		}
 	}
 	return items
+}
+
+/**
+ * Standalone
+ */
+
+func Len(v any) int {
+	switch reflect.TypeOf(v).Kind() {
+	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice, reflect.String:
+		return reflect.ValueOf(v).Len()
+	default:
+		return -1
+	}
+}
+
+func Empty(v any) bool {
+	return Len(v) == 0
+}
+
+func Count[T ~[]E, E comparable](items T) map[E]int {
+	times := make(map[E]int)
+	for _, item := range items {
+		times[item]++
+	}
+
+	return times
+}
+
+func Times[T ~[]E, E any](number int, callback func(number int) E) *SliceCollection[T, E] {
+	items := make(T, number)
+	for i := 0; i < number; i++ {
+		items[i] = callback(i + 1)
+	}
+
+	return UseSlice[T, E](items)
+}
+
+func SortBy[T ~[]E, E any, C func(item E, index int) R, R constraints.Ordered](items T, callback C) *SliceCollection[T, E] {
+	structs := make([]*types.SortableStruct[R], len(items))
+	for index, item := range items {
+		structs[index] = &types.SortableStruct[R]{callback(item, index), index}
+	}
+
+	replica := make(T, len(items))
+	copy(replica, items)
+
+	sort.Sort(&types.SortableStructs[[]R, R]{structs})
+	for index, s := range structs {
+		items[index] = replica[s.Attached.(int)]
+	}
+
+	return UseSlice[T, E](items)
 }

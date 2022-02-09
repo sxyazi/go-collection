@@ -117,3 +117,7 @@ func (s *SliceCollection[T, E]) Splice(offset int, args ...any) *SliceCollection
 	s.z = Splice[T, E](s.All(), offset, args...)
 	return s.New(remaining)
 }
+
+func (s *SliceCollection[T, E]) Reduce(initial E, callback func(carry E, value E, key int) E) E {
+	return Reduce[T, E](s.All(), initial, callback)
+}

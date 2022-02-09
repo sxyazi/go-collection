@@ -86,9 +86,9 @@ func OffsetToIndex(actual, offset int, args ...int) (int, int) {
 	return offset, offset + length
 }
 
-func NumberFrom[N constraints.Integer | constraints.Float, T ~[]E, E comparable](c *SliceCollection[T, E]) *numberCollection[[]N, N] {
+func NumberFrom[N constraints.Integer | constraints.Float, T ~[]E, E comparable](c *SliceCollection[T, E]) *NumberCollection[[]N, N] {
 	if c.Empty() {
-		return &numberCollection[[]N, N]{}
+		return &NumberCollection[[]N, N]{}
 	}
 
 	z := c.All()

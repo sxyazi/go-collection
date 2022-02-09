@@ -494,18 +494,7 @@ collect.UseSlice(arr[:]).Len()
   <summary>例子</summary>
 
   ```go
-  collect.Sum([]float64{1.1, 2.2, 3.3})  // 6.6
-  ```
-
-  </details>
-
-- Avg：求平均数
-
-  <details>
-  <summary>例子</summary>
-
-  ```go
-  collect.Avg([]float64{1.1, 2.2, 3.3})  // 2.2
+  collect.Sum([]float64{1, 3.14})  // 4.14
   ```
 
   </details>
@@ -528,6 +517,39 @@ collect.UseSlice(arr[:]).Len()
 
   ```go
   collect.Max([]int{0, 1, -3})  // 1
+  ```
+
+  </details>
+
+- Sort：对集合中的数字按升序排序
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.Sort([]float64{1, -4, 0, -4.3})  // []float64{-4.3, -4, 0, 1}
+  ```
+
+  </details>
+
+- Avg：求平均数
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.Avg([]int{1, 2, 3, 4})  // 2.5
+  ```
+
+  </details>
+
+- Median：求中位数
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.Median([]int{1, 2, 3, 4})  // 2.5
   ```
 
   </details>

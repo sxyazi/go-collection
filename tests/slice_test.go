@@ -510,3 +510,11 @@ func TestSlice_Splice(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSlice_Reduce(t *testing.T) {
+	if UseSlice([]int{1, 2, 3}).Reduce(100, func(carry, value, key int) int {
+		return carry + value
+	}) != 106 {
+		t.Fail()
+	}
+}

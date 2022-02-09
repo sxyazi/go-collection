@@ -494,18 +494,7 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
   <summary>Examples</summary>
 
   ```go
-  collect.Sum([]float64{1.1, 2.2, 3.3})  // 6.6
-  ```
-
-  </details>
-
-- `Avg` calculates the average
-
-  <details>
-  <summary>Examples</summary>
-
-  ```go
-  collect.Avg([]float64{1.1, 2.2, 3.3})  // 2.2
+  collect.Sum([]float64{1, 3.14})  // 4.14
   ```
 
   </details>
@@ -528,6 +517,39 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
 
   ```go
   collect.Max([]int{0, 1, -3})  // 1
+  ```
+
+  </details>
+
+- `Sort` sorts the numbers in the collection in ascending order
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.Sort([]float64{1, -4, 0, -4.3})  // []float64{-4.3, -4, 0, 1}
+  ```
+
+  </details>
+
+- `Avg` calculates the average
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.Avg([]int{1, 2, 3, 4})  // 2.5
+  ```
+
+  </details>
+
+- `Median` calculates the median
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.Median([]int{1, 2, 3, 4})  // 2.5
   ```
 
   </details>
