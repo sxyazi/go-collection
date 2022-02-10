@@ -11,7 +11,7 @@ collect.Reduce(collect.Filter(collect.Map([]int{1, 2, 3}, fn), fn), fn)
 Equivalent to:
 
 ```go
-collect.UseSlice([]int{1, 2, 3}).Map(fn).Filter(fn).Reduce(fn).All()
+collect.UseSlice([]int{1, 2, 3}).Map(fn).Filter(fn).Reduce(fn)
 ```
 
 **_Note: Since Go 1.18 has not yet been officially released and its language behavior may still change after the release, go-collection is currently for trial use only. If you have additional questions or suggestions, please [file an issue](https://github.com/sxyazi/go-collection/issues/new)._**
