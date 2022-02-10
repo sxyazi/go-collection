@@ -14,6 +14,10 @@ Equivalent to:
 collect.UseSlice([]int{1, 2, 3}).Map(fn).Filter(fn).Reduce(fn).All()
 ```
 
+**_Note: Since Go 1.18 has not yet been officially released and its language behavior may still change after the release, go-collection is currently for trial use only. If you have additional questions or suggestions, please [file an issue](https://github.com/sxyazi/go-collection/issues/new)._**
+
+**_Note: Go 1.18 Beta 2, released this past week, still has some bugs, so you will need to use the [gotip](https://pkg.go.dev/golang.org/dl/gotip) tool to get the latest master branch of Go when trying out go-collection._**
+
 ## Installation
 
 ```shell
@@ -334,6 +338,19 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
+- `Reduce` reduces the collection to a single value, and the parameters of each iteration are the results of the previous iteration
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.Reduce([]int{1, 2, 3}, 100, func(carry, value, key int) int {
+  	return carry + value
+  })  // 106
+  ```
+
+  </details>
+
 - `Count` counts the number of occurrences of each element in the slice
 
   <details>
@@ -532,6 +549,17 @@ The corresponding chained function is `collect.UseNumber()`，which is a subset 
 
   </details>
 
+- `SortDesc` sorts the numbers in the collection in descending order
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.SortDesc([]float64{1, -4, 0, -4.3})  // []float64{1, 0, -4, -4.3}
+  ```
+
+  </details>
+
 - `Avg` calculates the average
 
   <details>
@@ -612,7 +640,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- `MapKeyBy` retrieves the set with the value of the given key as the identifier (if there are duplicate keys, only the last one will be kept), only maps are supported
+- `MapKeyBy` retrieves the collection with the value of the given key as the identifier (if there are duplicate keys, only the last one will be kept), only maps are supported
 
   <details>
   <summary>Examples</summary>
@@ -644,6 +672,45 @@ Due to Golang's support for generics, it is [not possible to define generic type
   ```go
   d := []map[string]int{{"ID": 33, "Score": 6}, {"ID": 193, "Score": 10}, {"ID": 194, "Score": 10}}
   collect.MapGroupBy(d, "Score")  // map[6:[map[ID:33 Score:6]] 10:[map[ID:193 Score:10] map[ID:194 Score:10]]]
+  ```
+
+  </details>
+
+- `Times` creates a new collection of slices by calling the callback with specified number of times
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.Times(3, func(number int) float64 {
+  	return float64(number) * 3.14
+  })  // *SliceCollection{[]float64{3.14, 6.28, 9.42}}
+  ```
+
+  </details>
+
+- `SortBy` calls a callback for each element and performs an ascending sort by the return value of the callback
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.SortBy([]int{2, 1, 3}, func(item, index int) string {
+  	return strconv.Itoa(item)
+  })  // *SliceCollection{[]int{1, 2, 3}}
+  ```
+
+  </details>
+
+- `SortByDesc` calls a callback for each element and performs a descending sort by the return value of the callback
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  collect.SortByDesc([]int{2, 1, 3}, func(item, index int) string {
+  	return strconv.Itoa(item)
+  })  // *SliceCollection{[]int{3, 2, 1}}
   ```
 
   </details>

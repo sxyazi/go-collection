@@ -285,7 +285,12 @@ func Max[T ~[]E, E constraints.Integer | constraints.Float](items T) E {
 }
 
 func Sort[T ~[]E, E constraints.Ordered](items T) T {
-	sort.Sort(&types.SortableSlice[T, E]{items})
+	sort.Sort(&types.SortableSlice[T, E]{items, false})
+	return items
+}
+
+func SortDesc[T ~[]E, E constraints.Ordered](items T) T {
+	sort.Sort(&types.SortableSlice[T, E]{items, true})
 	return items
 }
 
@@ -470,7 +475,7 @@ func Times[T ~[]E, E any](number int, callback func(number int) E) *SliceCollect
 	return UseSlice[T, E](items)
 }
 
-func SortBy[T ~[]E, E any, C func(item E, index int) R, R constraints.Ordered](items T, callback C) *SliceCollection[T, E] {
+func sortBy[T ~[]E, E any, C func(item E, index int) R, R constraints.Ordered](items T, desc bool, callback C) *SliceCollection[T, E] {
 	structs := make([]*types.SortableStruct[R], len(items))
 	for index, item := range items {
 		structs[index] = &types.SortableStruct[R]{callback(item, index), index}
@@ -479,10 +484,18 @@ func SortBy[T ~[]E, E any, C func(item E, index int) R, R constraints.Ordered](i
 	replica := make(T, len(items))
 	copy(replica, items)
 
-	sort.Sort(&types.SortableStructs[[]R, R]{structs})
+	sort.Sort(&types.SortableStructs[[]R, R]{structs, desc})
 	for index, s := range structs {
 		items[index] = replica[s.Attached.(int)]
 	}
 
 	return UseSlice[T, E](items)
+}
+
+func SortBy[T ~[]E, E any, C func(item E, index int) R, R constraints.Ordered](items T, callback C) *SliceCollection[T, E] {
+	return sortBy[T, E, C, R](items, false, callback)
+}
+
+func SortByDesc[T ~[]E, E any, C func(item E, index int) R, R constraints.Ordered](items T, callback C) *SliceCollection[T, E] {
+	return sortBy[T, E, C, R](items, true, callback)
 }

@@ -38,6 +38,18 @@ func TestNumber_Sort(t *testing.T) {
 	}
 }
 
+func TestNumber_SortDesc(t *testing.T) {
+	d1 := []float64{0, 17.5, -4.01, 0.2, 59, 33, -4}
+	if !UseNumber(d1).SortDesc().Same([]float64{59, 33, 17.5, 0.2, 0, -4, -4.01}) {
+		t.Fail()
+	}
+
+	d2 := []int{392, 17, 65, 0, 59, 33, -4}
+	if !UseNumber(d2).SortDesc().Same([]int{392, 65, 59, 33, 17, 0, -4}) {
+		t.Fail()
+	}
+}
+
 func TestNumber_Avg(t *testing.T) {
 	d := []float64{0, 1.1, 2.2, 3.3, 4.4, 5.5}
 	if UseNumber(d).Avg() != 2.75 {

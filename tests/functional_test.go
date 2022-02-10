@@ -66,3 +66,11 @@ func TestFunctional_SortBy(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestFunctional_SortByDesc(t *testing.T) {
+	if !SortByDesc([]int{2, 1, 3}, func(item, index int) string {
+		return strconv.Itoa(item)
+	}).Same([]int{3, 2, 1}) {
+		t.Fail()
+	}
+}

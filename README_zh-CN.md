@@ -14,6 +14,10 @@ collect.Reduce(collect.Filter(collect.Map([]int{1, 2, 3}, fn), fn), fn)
 collect.UseSlice([]int{1, 2, 3}).Map(fn).Filter(fn).Reduce(fn).All()
 ```
 
+**_注意：由于 Go 1.18 还未正式发布，其语言行为仍可能在发布后产生变化，因此目前 go-collection 仅作试用用途。如果您有其它的疑问或建议，请[创建一个 issue](https://github.com/sxyazi/go-collection/issues/new)。_**
+
+**_注意：过去一周发布的 Go 1.18 Beta 2 仍存在一些 Bug，因此在试用 go-collection 时，您需要使用 [gotip](https://pkg.go.dev/golang.org/dl/gotip) 工具获取 Go 最新的 master 分支版本。_**
+
 ## 安装
 
 ```shell
@@ -28,7 +32,7 @@ import collect "github.com/sxyazi/go-collection"
 
 ## API
 
-它的 API 非常简单，如果你用过其它类似的包，应该可以在几分钟内上手它。**为了方便，下面以函数的形式介绍它们**。
+它的 API 非常简单，如果您用过其它类似的包，应该可以在几分钟内上手它。**为了方便，下面以函数的形式介绍它们**。
 
 ### 切片
 
@@ -334,6 +338,19 @@ import collect "github.com/sxyazi/go-collection"
 
   </details>
 
+- Reduce：将集合减少到一个单一的值，每轮迭代的参数为上一轮迭代的结果
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.Reduce([]int{1, 2, 3}, 100, func(carry, value, key int) int {
+  	return carry + value
+  })  // 106
+  ```
+
+  </details>
+
 - Count：统计切片中每个元素出现的次数
 
   <details>
@@ -348,7 +365,7 @@ import collect "github.com/sxyazi/go-collection"
 
 ### 数组
 
-与 [切片](#切片) 完全一致，你只需将数组转换为切片传入：
+与 [切片](#切片) 完全一致，您只需将数组转换为切片传入：
 
 ```go
 arr := [3]int{1, 2, 3}
@@ -532,6 +549,17 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
+- SortDesc：对集合中的数字按降序排序
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.SortDesc([]float64{1, -4, 0, -4.3})  // []float64{1, 0, -4, -4.3}
+  ```
+
+  </details>
+
 - Avg：求平均数
 
   <details>
@@ -644,6 +672,45 @@ collect.UseSlice(arr[:]).Len()
   ```go
   d := []map[string]int{{"ID": 33, "Score": 6}, {"ID": 193, "Score": 10}, {"ID": 194, "Score": 10}}
   collect.MapGroupBy(d, "Score")  // map[6:[map[ID:33 Score:6]] 10:[map[ID:193 Score:10] map[ID:194 Score:10]]]
+  ```
+
+  </details>
+
+- Times：通过调用指定次数的回调，创建一个新的切片集合
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.Times(3, func(number int) float64 {
+  	return float64(number) * 3.14
+  })  // *SliceCollection{[]float64{3.14, 6.28, 9.42}}
+  ```
+
+  </details>
+
+- SortBy：为每个元素调用回调函数，并按回调函数的返回值执行升序排序
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.SortBy([]int{2, 1, 3}, func(item, index int) string {
+  	return strconv.Itoa(item)
+  })  // *SliceCollection{[]int{1, 2, 3}}
+  ```
+
+  </details>
+
+- SortByDesc：为每个元素调用回调函数，并按回调函数的返回值执行降序排序
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  collect.SortByDesc([]int{2, 1, 3}, func(item, index int) string {
+  	return strconv.Itoa(item)
+  })  // *SliceCollection{[]int{3, 2, 1}}
   ```
 
   </details>

@@ -29,6 +29,11 @@ func (n *NumberCollection[T, E]) Sort() *NumberCollection[T, E] {
 	return n
 }
 
+func (n *NumberCollection[T, E]) SortDesc() *NumberCollection[T, E] {
+	n.z = SortDesc[T, E](n.All())
+	return n
+}
+
 func (n *NumberCollection[T, E]) Avg() float64 {
 	return Avg[T, E](n.All())
 }
