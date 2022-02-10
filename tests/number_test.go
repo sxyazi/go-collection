@@ -2,6 +2,7 @@ package tests
 
 import (
 	. "github.com/sxyazi/go-collection"
+	"math"
 	"testing"
 )
 
@@ -34,6 +35,11 @@ func TestNumber_Sort(t *testing.T) {
 
 	d2 := []int{392, 17, 65, 0, 59, 33, -4}
 	if !UseNumber(d2).Sort().Same([]int{-4, 0, 17, 33, 59, 65, 392}) {
+		t.Fail()
+	}
+
+	d3 := []float64{0, math.NaN(), 17.5, math.NaN(), -4.01}
+	if !UseNumber(d3).Sort().Same([]float64{math.NaN(), math.NaN(), -4.01, 0, 17.5}) {
 		t.Fail()
 	}
 }

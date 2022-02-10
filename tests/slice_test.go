@@ -2,6 +2,7 @@ package tests
 
 import (
 	. "github.com/sxyazi/go-collection"
+	"math"
 	"testing"
 )
 
@@ -78,6 +79,13 @@ func TestSlice_Same(t *testing.T) {
 		t.Fail()
 	}
 	if UseSlice(s4).Same([][]int{s1, s3}) {
+		t.Fail()
+	}
+
+	if !UseSlice([]float64{math.NaN(), math.NaN()}).Same([]float64{math.NaN(), math.NaN()}) {
+		t.Fail()
+	}
+	if UseSlice([]float64{math.NaN(), math.NaN()}).Same([]float64{0, math.NaN()}) {
 		t.Fail()
 	}
 }

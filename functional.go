@@ -39,6 +39,9 @@ func Same[T ~[]E, E any](items, target T) bool {
 				return false
 			}
 		case reflect.Float64:
+			if math.IsNaN(any(item).(float64)) && !math.IsNaN(any(target[index]).(float64)) {
+				return false
+			}
 			if math.Abs(any(item).(float64)-any(target[index]).(float64)) > 1e-9 {
 				return false
 			}
@@ -410,6 +413,9 @@ func MapSame[T ~map[K]V, K comparable, V any](items, target T) bool {
 				return false
 			}
 		case reflect.Float64:
+			if math.IsNaN(any(item).(float64)) && !math.IsNaN(any(tv).(float64)) {
+				return false
+			}
 			if math.Abs(any(item).(float64)-any(tv).(float64)) > 1e-9 {
 				return false
 			}
