@@ -246,6 +246,23 @@ func Reduce[T ~[]E, E any](items T, initial E, callback func(carry E, value E, k
 	return initial
 }
 
+func Pop[T ~[]E, E any](items *T) (E, bool) {
+	l := len(*items)
+	if l == 0 {
+		var zero E
+		return zero, false
+	}
+
+	value := (*items)[l-1]
+	*items = append((*items)[:l-1], (*items)[l:]...)
+	return value, true
+}
+
+func Push[T ~[]E, E any](items *T, item E) T {
+	*items = append(*items, item)
+	return *items
+}
+
 /**
  * Number slice
  */
@@ -376,17 +393,26 @@ func Has[T ~map[K]V, K comparable, V any](items T, key K) bool {
 	}
 }
 
-func Set[T ~map[K]V, K comparable, V any](items T, key K, value V) T {
-	items[key] = value
-	return items
-}
-
 func Get[T ~map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
 	if !Has[T, K, V](items, key) {
 		return
 	}
 
 	return items[key], true
+}
+
+func Put[T ~map[K]V, K comparable, V any](items T, key K, value V) T {
+	items[key] = value
+	return items
+}
+
+func Pull[T ~map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
+	if v, ok := items[key]; ok {
+		delete(items, key)
+		return v, true
+	}
+
+	return
 }
 
 func MapSame[T ~map[K]V, K comparable, V any](items, target T) bool {

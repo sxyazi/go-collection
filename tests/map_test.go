@@ -21,7 +21,7 @@ func TestMap_New(t *testing.T) {
 	m1 := UseMap(d1)
 	m2 := m1.New(d2)
 
-	m2.Set("bar", 100)
+	m2.Put("bar", 100)
 	if !m1.Same(d1) || m2.Same(d1) {
 		t.Fail()
 	}
@@ -83,7 +83,8 @@ func TestMap_Except(t *testing.T) {
 
 func TestMap_Keys(t *testing.T) {
 	d1 := map[string]int{"foo": 1, "bar": 0, "baz": 2}
-	if !UseSlice(UseMap(d1).Keys()).Same([]string{"foo", "bar", "baz"}) {
+	c := UseSlice(UseMap(d1).Keys())
+	if c.Len() != 3 || !c.Contains("foo") || !c.Contains("bar") || !c.Contains("baz") {
 		t.Fail()
 	}
 
@@ -121,15 +122,6 @@ func TestMap_Has(t *testing.T) {
 	}
 }
 
-func TestMap_Set(t *testing.T) {
-	d1 := map[string]int{"foo": 1}
-
-	UseMap(d1).Set("bar", 20)
-	if !UseMap(d1).Same(map[string]int{"foo": 1, "bar": 20}) {
-		t.Fail()
-	}
-}
-
 func TestMap_Get(t *testing.T) {
 	d1 := map[string]int{"foo": 1, "bar": 0}
 	if v, ok := UseMap(d1).Get("foo"); !ok || v != 1 {
@@ -141,6 +133,48 @@ func TestMap_Get(t *testing.T) {
 
 	d2 := map[string]int{}
 	if v, ok := UseMap(d2).Get("foo"); ok || v != 0 {
+		t.Fail()
+	}
+}
+
+func TestMap_Put(t *testing.T) {
+	d1 := map[string]int{"foo": 1}
+
+	UseMap(d1).Put("bar", 20)
+	if !UseMap(d1).Same(map[string]int{"foo": 1, "bar": 20}) {
+		t.Fail()
+	}
+
+	// Functional test
+	d2 := map[string]int{"foo": 1}
+	Put(d2, "bar", 20)
+	if !UseMap(d2).Same(map[string]int{"foo": 1, "bar": 20}) {
+		t.Fail()
+	}
+}
+
+func TestMap_Pull(t *testing.T) {
+	d1 := map[string]int{"foo": 1, "bar": 2}
+	c1 := UseMap(d1)
+	if v, ok := c1.Pull("bar"); !ok || v != 2 {
+		t.Fail()
+	}
+	if v, ok := c1.Pull("bar"); ok || v != 0 {
+		t.Fail()
+	}
+	if !c1.Same(map[string]int{"foo": 1}) {
+		t.Fail()
+	}
+	if !UseMap(d1).Same(map[string]int{"foo": 1}) {
+		t.Fail()
+	}
+
+	// Functional test
+	d2 := map[string]int{"foo": 1, "bar": 2}
+	if v, ok := Pull(d2, "bar"); !ok || v != 2 {
+		t.Fail()
+	}
+	if !UseMap(d2).Same(map[string]int{"foo": 1}) {
 		t.Fail()
 	}
 }
@@ -168,12 +202,12 @@ func TestMap_Same(t *testing.T) {
 		t.Fail()
 	}
 
-	UseMap(d4).Set("bar", Foo{Bar: "ccc"})
+	UseMap(d4).Put("bar", Foo{Bar: "ccc"})
 	if UseMap(d3).Same(d4) {
 		t.Fail()
 	}
 
-	UseMap(d4).Set("bar", Foo{Bar: "bbb"})
+	UseMap(d4).Put("bar", Foo{Bar: "bbb"})
 	if !UseMap(d3).Same(d4) {
 		t.Fail()
 	}

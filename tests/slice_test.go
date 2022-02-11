@@ -526,3 +526,41 @@ func TestSlice_Reduce(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSlice_Pop(t *testing.T) {
+	c := UseSlice([]int{1, 2})
+	if v, ok := c.Pop(); !ok || v != 2 {
+		t.Fail()
+	}
+	if v, ok := c.Pop(); !ok || v != 1 {
+		t.Fail()
+	}
+	if !c.Empty() {
+		t.Fail()
+	}
+	if v, ok := c.Pop(); ok || v != 0 {
+		t.Fail()
+	}
+
+	// Functional test
+	d := []int{1, 2}
+	Pop(&d)
+	if !Same(d, []int{1}) {
+		t.Fail()
+	}
+}
+
+func TestSlice_Push(t *testing.T) {
+	c := UseSlice([]int{1, 2, 3})
+	c.Push(4)
+	if !c.Same([]int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+
+	// Functional test
+	d := []int{1, 2, 3}
+	Push(&d, 4)
+	if !Same(d, []int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+}

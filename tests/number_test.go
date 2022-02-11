@@ -54,6 +54,11 @@ func TestNumber_SortDesc(t *testing.T) {
 	if !UseNumber(d2).SortDesc().Same([]int{392, 65, 59, 33, 17, 0, -4}) {
 		t.Fail()
 	}
+
+	d3 := []float64{0, math.NaN(), 17.5, math.NaN(), -4.01}
+	if !UseNumber(d3).SortDesc().Same([]float64{17.5, 0, -4.01, math.NaN(), math.NaN()}) {
+		t.Fail()
+	}
 }
 
 func TestNumber_Avg(t *testing.T) {
