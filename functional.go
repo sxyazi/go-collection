@@ -136,11 +136,12 @@ func Filter[T ~[]E, E any](items T, callback func(value E, index int) bool) T {
 }
 
 func Map[T ~[]E, E any](items T, callback func(value E, index int) E) T {
+	mapped := make(T, len(items), cap(items))
 	for index, item := range items {
-		items[index] = callback(item, index)
+		mapped[index] = callback(item, index)
 	}
 
-	return items
+	return mapped
 }
 
 func Unique[T ~[]E, E any](items T) T {
@@ -211,31 +212,35 @@ func Split[T ~[]E, E any](items T, amount int) []T {
 	return split
 }
 
-func Splice[T ~[]E, E any](items T, offset int, args ...any) T {
-	length := len(items)
+func Splice[T ~[]E, E any](items *T, offset int, args ...any) T {
+	length := len(*items)
 	if len(args) >= 1 {
 		length = args[0].(int)
 	}
 
-	start, end := OffsetToIndex(len(items), offset, length)
-	replica := make(T, start)
-	copy(replica, items[:start])
+	start, end := OffsetToIndex(len(*items), offset, length)
+	slice := make(T, end-start)
+	copy(slice, (*items)[start:end])
 
 	if len(args) < 2 {
-		return append(replica, items[end:]...)
+		*items = append((*items)[:start], (*items)[end:]...)
+		return slice
 	}
 
+	reps := (*items)[:start]
 	for _, rep := range args[1:] {
 		switch v := rep.(type) {
 		case E:
-			replica = append(replica, v)
+			reps = append(reps, v)
 		case T:
-			replica = append(replica, v...)
+			reps = append(reps, v...)
 		default:
 			panic("replacement type error")
 		}
 	}
-	return append(replica, items[end:]...)
+
+	*items = append(reps, (*items)[end:]...)
+	return slice
 }
 
 func Reduce[T ~[]E, E any](items T, initial E, callback func(carry E, value E, key int) E) E {

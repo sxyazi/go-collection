@@ -107,15 +107,7 @@ func (s *SliceCollection[T, E]) Split(amount int) []T {
 }
 
 func (s *SliceCollection[T, E]) Splice(offset int, args ...any) *SliceCollection[T, E] {
-	var remaining T
-	if len(args) >= 1 {
-		remaining = Slice[T, E](s.z, offset, args[0].(int))
-	} else {
-		remaining = Slice[T, E](s.z, offset)
-	}
-
-	s.z = Splice[T, E](s.z, offset, args...)
-	return s.New(remaining)
+	return s.New(Splice[T, E](&s.z, offset, args...))
 }
 
 func (s *SliceCollection[T, E]) Reduce(initial E, callback func(carry E, value E, key int) E) E {

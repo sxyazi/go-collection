@@ -305,35 +305,32 @@ The corresponding chained function is `collect.UseSlice()`
 
   ```go
   d := []int{1, 2, 3, 4, 5}
-  collect.Splice(d, 2)  // []int{1, 2}
+  collect.Splice(&d, 2)  // []int{3, 4, 5}
+  d                      // []int{1, 2}
   ```
 
   Function signature: `Splice(items T, offset, length int)`
 
   ```go
   d := []int{1, 2, 3, 4, 5}
-  collect.Splice(d, 2, 2)  // []int{1, 2, 5}
+  collect.Splice(&d, 2, 2)  // []int{3, 4}
+  d                         // []int{1, 2, 5}
   ```
 
   Function signature: `Splice(items T, offset, length int, replacements ...T|E)`
 
   ```go
-  d := []int{1, 2, 3, 4}
-  collect.Splice(d, 1, 2, []int{22, 33})             // []int{1, 22, 33, 4}
-  collect.Splice(d, 1, 2, 233, 333)                  // []int{1, 222, 333, 4}
-  collect.Splice(d, 1, 2, []int{22}, 33, []int{44})  // []int{1, 22, 33, 44, 4}
-  ```
+  d1 := []int{1, 2, 3, 4}
+  collect.Splice(&d1, 1, 2, []int{22, 33})  // []int{2, 3}
+  d1                                        // []int{1, 22, 33, 4}
 
-  It is worth noting that the `Splice` method in the chain differs from the above in that it returns the deleted elements, and the result of the deletion occurs on the original collection:
+  d2 := []int{1, 2, 3, 4}
+  collect.Splice(&d2, 1, 2, 22, 33)  // []int{2, 3}
+  d2                                 // []int{1, 22, 33, 4}
 
-  ```go
-  c1 := collect.UseSlice([]int{1, 2, 3, 4})
-  c1.Splice(2)  // []int{3, 4}
-  c1.All()      // []int{1, 2}
-
-  c2 := collect.UseSlice([]int{1, 2, 3, 4})
-  c2.Splice(1, 2, []int{22, 33})  // []int{2, 3}
-  c2.All()                        // []int{1, 22, 33, 4}
+  d3 := []int{1, 2, 3, 4}
+  collect.Splice(&d3, 1, 2, []int{22}, 33, []int{55})  // []int{2, 3}
+  d3                                                   // []int{1, 22, 33, 55, 4}
   ```
 
   </details>
