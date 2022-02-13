@@ -7,6 +7,10 @@ import (
 )
 
 func TestFunctional_Len(t *testing.T) {
+	if Len(nil) != -1 {
+		t.Fail()
+	}
+
 	if Len([...]int{}) != 0 {
 		t.Fail()
 	}

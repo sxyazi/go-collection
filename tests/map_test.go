@@ -180,6 +180,10 @@ func TestMap_Pull(t *testing.T) {
 }
 
 func TestMap_Same(t *testing.T) {
+	if !UseMap[map[int]int, int, int](nil).Same(nil) {
+		t.Fail()
+	}
+
 	d1 := map[string]int{"foo": 1, "bar": 0}
 	d2 := map[string]int{"foo": 1, "bar": 0}
 	if !UseMap(d1).Same(d1) {

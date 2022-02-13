@@ -49,6 +49,10 @@ func TestSlice_Empty(t *testing.T) {
 }
 
 func TestSlice_Same(t *testing.T) {
+	if !UseSlice[[]int, int](nil).Same(nil) {
+		t.Fail()
+	}
+
 	if !UseSlice([]int{1, 2, 3}).Same([]int{1, 2, 3}) {
 		t.Fail()
 	}
@@ -107,6 +111,11 @@ func TestSlice_Last(t *testing.T) {
 }
 
 func TestSlice_Index(t *testing.T) {
+	// Nil
+	if v := UseSlice[[]int, int](nil).Index(1); v != -1 {
+		t.Fail()
+	}
+
 	// Integer
 	d1 := []int{1, 2, 3}
 	if v := UseSlice(d1).Index(2); v != 1 {
@@ -222,6 +231,9 @@ func TestSlice_Unique(t *testing.T) {
 	s1 := []int{1, 2, 3}
 	s2 := []int{4, 5, 6}
 	if !UseSlice([][]int{s1, s2, s1}).Unique().Same([][]int{s1, s2}) {
+		t.Fail()
+	}
+	if !UseSlice([][]int{s1, nil, s2, nil, s1}).Unique().Same([][]int{s1, nil, s2}) {
 		t.Fail()
 	}
 	if !UseSlice([]*[]int{&s1, &s2, &s1}).Unique().Same([]*[]int{&s1, &s2}) {
@@ -561,6 +573,50 @@ func TestSlice_Push(t *testing.T) {
 	d := []int{1, 2, 3}
 	Push(&d, 4)
 	if !Same(d, []int{1, 2, 3, 4}) {
+		t.Fail()
+	}
+}
+
+// TODO: in, notin
+func TestSlice_Where(t *testing.T) {
+	// Only target
+	if !UseSlice([]int{1, 2, 3}).Where(2).Same([]int{2}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).Where(4).Same([]int{}) {
+		t.Fail()
+	}
+
+	// Operator and target
+	if !UseSlice([]int{1, 2, 3}).Where("!=", 4).Same([]int{1, 2, 3}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).Where("!=", 2).Same([]int{1, 3}) {
+		t.Fail()
+	}
+
+	u1 := User{1, "Hugo"}
+	u2 := User{2, "Lisa"}
+	u3 := User{3, "Iris"}
+	u4 := User{4, "Lisa"}
+	if !UseSlice([]User{u1, u2, u3, u4}).Where("!=", u2).Same([]User{u1, u3, u4}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("!=", &u2).Same([]*User{&u1, &u3, &u4}) {
+		t.Fail()
+	}
+	if UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("!=", u2).Same([]*User{&u1, &u3, &u4}) {
+		t.Fail()
+	}
+
+	// Key and target
+	d1 := []User{u1, u2, u3, u4}
+	if !UseSlice(d1).Where("Name", "Lisa").Same([]User{{2, "Lisa"}, {4, "Lisa"}}) {
+		t.Fail()
+	}
+
+	// Key, operator and target
+	if !UseSlice(d1).Where("Name", "!=", "Lisa").Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
 		t.Fail()
 	}
 }

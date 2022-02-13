@@ -21,7 +21,11 @@ func Each[T ~[]E, E any](items T, callback func(value E, index int)) {
 }
 
 func Same[T ~[]E, E any](items, target T) bool {
-	if len(items) != len(target) {
+	if items == nil && target == nil {
+		return true
+	} else if items == nil || target == nil {
+		return false
+	} else if len(items) != len(target) {
 		return false
 	} else if len(items) == 0 {
 		return true
@@ -75,9 +79,12 @@ func Last[T ~[]E, E any](items T) (E, bool) {
 }
 
 func Index[T ~[]E, E any](items T, target E) int {
+	if items == nil {
+		return -1
+	}
+
 	r1 := reflect.ValueOf(target)
 	kind := reflect.TypeOf(items).Elem().Kind()
-
 	for index, item := range items {
 		if kind == reflect.Float64 {
 			if math.Abs(any(target).(float64)-any(item).(float64)) <= 1e-9 {
@@ -145,9 +152,12 @@ func Map[T ~[]E, E any](items T, callback func(value E, index int) E) T {
 }
 
 func Unique[T ~[]E, E any](items T) T {
+	if items == nil {
+		return items
+	}
+
 	set := make(map[any]struct{})
 	kind := reflect.TypeOf(items).Elem().Kind()
-
 	return Filter(items, func(value E, index int) bool {
 		switch kind {
 		case reflect.Slice:
@@ -266,6 +276,60 @@ func Pop[T ~[]E, E any](items *T) (E, bool) {
 func Push[T ~[]E, E any](items *T, item E) T {
 	*items = append(*items, item)
 	return *items
+}
+
+func Where[T ~[]E, E any](items T, args ...any) T {
+	if len(args) < 1 {
+		return items
+	}
+
+	// Where(target any)
+	// eg: UseSlice([]int{1,2,3}).Where(2)
+	if len(args) == 1 {
+		return Filter(items, func(value E, _ int) bool {
+			return Compare(value, "=", args[0])
+		})
+	}
+
+	var operator string
+	var key any = nil
+	var target any
+
+	// Where(key any, operator string, target any)
+	// eg: Where("id", "!=", 33)
+	if len(args) >= 3 {
+		key = args[0]
+		operator = args[1].(string)
+		target = args[2]
+	} else {
+		// Where(operator string, target any)  |  Where(key any, target any)
+		// eg: Where("!=", 2)  |  Where("id", 33)
+		switch v := args[0].(type) {
+		case string:
+			if Contains([]string{"=", "!=", ">", "<", ">=", "<="}, v) {
+				operator = v
+				target = args[1]
+			} else {
+				key = v
+				operator = "="
+				target = args[1]
+			}
+		default:
+			key = args[0]
+			operator = "="
+			target = args[1]
+		}
+	}
+
+	return Filter[T, E](items, func(value E, _ int) bool {
+		if key == nil {
+			return Compare(value, operator, target)
+		} else if c, err := AnyGet[any](value, key); err == nil {
+			return Compare(c, operator, target)
+		}
+
+		return false
+	})
 }
 
 /**
@@ -421,7 +485,11 @@ func Pull[T ~map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
 }
 
 func MapSame[T ~map[K]V, K comparable, V any](items, target T) bool {
-	if len(items) != len(target) {
+	if items == nil && target == nil {
+		return true
+	} else if items == nil || target == nil {
+		return false
+	} else if len(items) != len(target) {
 		return false
 	} else if len(items) == 0 {
 		return true
@@ -482,6 +550,10 @@ func Union[T ~map[K]V, K comparable, V any](items T, target T) T {
  */
 
 func Len(v any) int {
+	if v == nil {
+		return -1
+	}
+
 	switch reflect.TypeOf(v).Kind() {
 	case reflect.Array, reflect.Chan, reflect.Map, reflect.Slice, reflect.String:
 		return reflect.ValueOf(v).Len()

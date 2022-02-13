@@ -122,3 +122,8 @@ func (s *SliceCollection[T, E]) Push(item E) *SliceCollection[T, E] {
 	Push[T, E](&s.z, item)
 	return s
 }
+
+func (s *SliceCollection[T, E]) Where(args ...any) *SliceCollection[T, E] {
+	s.z = Where[T, E](s.z, args...)
+	return s
+}
