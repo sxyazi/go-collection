@@ -348,14 +348,72 @@ import collect "github.com/sxyazi/go-collection"
 
   </details>
 
-- Count：统计切片中每个元素出现的次数
+- Pop：移除并返回集合中的最后一个元素
 
   <details>
   <summary>例子</summary>
 
   ```go
-  d := []bool{true, true, false}
-  collect.Count(d)  // map[bool]int{true: 2, false: 1}
+  d := []int{1, 2}
+  v, ok := collect.Pop(&d)  // 2, true
+  d                         // []int{1}
+  ```
+
+  ```go
+  c := collect.UseSlice([]int{1, 2})
+  v, ok := c.Pop()  // 2, true
+  c.All()           // []int{1}
+  ```
+
+  </details>
+
+- Push：将一个元素追加到集合的末端
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  d := []int{1, 2}
+  Push(&d, 3)
+  d  // []int{1, 2, 3}
+  ```
+
+  ```go
+  c := collect.UseSlice([]int{1, 2})
+  c.Push(3).All()  // []int{1, 2, 3}
+  ```
+
+  </details>
+
+- Where：通过指定的条件过滤集合
+
+  <details>
+  <summary>例子</summary>
+
+  函数签名：`Where(items T, target any)`
+
+  ```go
+  collect.Where([]int{1, 2, 3}, 2)  // []int{2}
+  ```
+
+  函数签名：`Where(items T, operator string, target any)`
+
+  ```go
+  collect.Where([]int{1, 2, 3}, "!=", 2)  // []int{1, 3}
+  ```
+
+  函数签名：`Where(items T, key any, target any)`
+
+  ```go
+  d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
+  collect.Where(d, "Name", "Lisa")  // []User{{2 Lisa} {4 Lisa}}
+  ```
+
+  函数签名：`Where(items T, key any, operator string, target any)`
+
+  ```go
+  d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
+  collect.Where(d, "Name", "!=", "Lisa")  // []User{{1 Hugo} {3 Iris}}
   ```
 
   </details>
@@ -375,6 +433,30 @@ collect.UseSlice(arr[:]).Len()
 ### 映射
 
 对应的链式函数为 `collect.UseMap()`
+
+- Len：获取映射的元素个数
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  d1 := map[string]int{"a": 1, "b": 2, "c": 3}
+  collect.Len(d1) // 3
+  ```
+
+  </details>
+
+- Empty：检查映射是否为空
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  var d map[string]int
+  collect.Empty(d) // true
+  ```
+
+  </details>
 
 - Only：获取映射中指定键的元素
 
@@ -440,18 +522,6 @@ collect.UseSlice(arr[:]).Len()
 
   </details>
 
-- Set：设置映射中指定键的值
-
-  <details>
-  <summary>例子</summary>
-
-  ```go
-  d := map[string]int{"a": 1}
-  collect.Set(d, "b", 2)  // map[string]int{"a": 1, "b": 2}
-  ```
-
-  </details>
-
 - Get：获取映射中指定键的值
 
   <details>
@@ -462,6 +532,32 @@ collect.UseSlice(arr[:]).Len()
 
   value, ok := collect.Get(d, "a")  // 1, true
   value, ok := collect.Get(d, "b")  // 0, false
+  ```
+
+  </details>
+
+- Put：设置映射中指定键的值
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  d := map[string]int{"a": 1}
+  collect.Put(d, "b", 2)
+  d  // map[string]int{"a": 1, "b": 2}
+  ```
+
+  </details>
+
+- Pull：从集合中删除指定键，并返回其值
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  d := map[string]int{"a": 1, "b": 2}
+  v, ok := collect.Pull(d, "b")  // 2, true
+  d                              // map[string]int{"a": 1}
   ```
 
   </details>
@@ -477,10 +573,10 @@ collect.UseSlice(arr[:]).Len()
   d3 := map[string]int{"b": 222, "c": 3}
 
   collect.MapMerge(d1, d2)            // map[string]int{"a": 1, "b": 22}
-  collect.UseMap(d1).Merge(d2).All()  // Equal to the above
+  collect.UseMap(d1).Merge(d2).All()  // Equivalent to the above
 
   collect.MapMerge(d1, d2, d3)            // map[string]int{"a": 1, "b": 222, "c": 3}
-  collect.UseMap(d1).Merge(d2, d3).All()  // Equal to the above
+  collect.UseMap(d1).Merge(d2, d3).All()  // Equivalent to the above
   ```
 
   </details>
@@ -669,6 +765,18 @@ collect.UseSlice(arr[:]).Len()
   ```go
   d := []map[string]int{{"ID": 33, "Score": 6}, {"ID": 193, "Score": 10}, {"ID": 194, "Score": 10}}
   collect.MapGroupBy(d, "Score")  // map[6:[map[ID:33 Score:6]] 10:[map[ID:193 Score:10] map[ID:194 Score:10]]]
+  ```
+
+  </details>
+
+- Count：统计切片中每个元素出现的次数
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  d := []bool{true, true, false}
+  collect.Count(d)  // map[bool]int{true: 2, false: 1}
   ```
 
   </details>

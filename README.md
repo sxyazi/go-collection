@@ -348,14 +348,72 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- `Count` counts the number of occurrences of each element in the slice
+- `Pop` removes and returns the last element of the collection
 
   <details>
   <summary>Examples</summary>
 
   ```go
-  d := []bool{true, true, false}
-  collect.Count(d)  // map[bool]int{true: 2, false: 1}
+  d := []int{1, 2}
+  v, ok := collect.Pop(&d)  // 2, true
+  d                         // []int{1}
+  ```
+
+  ```go
+  c := collect.UseSlice([]int{1, 2})
+  v, ok := c.Pop()  // 2, true
+  c.All()           // []int{1}
+  ```
+
+  </details>
+
+- `Push` appends an element to the end of a collection
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  d := []int{1, 2}
+  Push(&d, 3)
+  d  // []int{1, 2, 3}
+  ```
+
+  ```go
+  c := collect.UseSlice([]int{1, 2})
+  c.Push(3).All()  // []int{1, 2, 3}
+  ```
+
+  </details>
+
+- `Where` filters the collection by the specified rules
+
+  <details>
+  <summary>Examples</summary>
+
+  Function signature: `Where(items T, target any)`
+
+  ```go
+  collect.Where([]int{1, 2, 3}, 2)  // []int{2}
+  ```
+
+  Function signature: `Where(items T, operator string, target any)`
+
+  ```go
+  collect.Where([]int{1, 2, 3}, "!=", 2)  // []int{1, 3}
+  ```
+
+  Function signature: `Where(items T, key any, target any)`
+
+  ```go
+  d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
+  collect.Where(d, "Name", "Lisa")  // []User{{2 Lisa} {4 Lisa}}
+  ```
+
+  Function signature: `Where(items T, key any, operator string, target any)`
+
+  ```go
+  d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
+  collect.Where(d, "Name", "!=", "Lisa")  // []User{{1 Hugo} {3 Iris}}
   ```
 
   </details>
@@ -375,6 +433,30 @@ collect.UseSlice(arr[:]).Len()
 ### Map
 
 The corresponding chained function is `collect.UseMap()`
+
+- `Len` gets the number of elements in the map
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  d1 := map[string]int{"a": 1, "b": 2, "c": 3}
+  collect.Len(d1) // 3
+  ```
+
+  </details>
+
+- `Empty` checks if the map is empty
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  var d map[string]int
+  collect.Empty(d) // true
+  ```
+
+  </details>
 
 - `Only` gets the elements of the map with the specified keys
 
@@ -440,18 +522,6 @@ The corresponding chained function is `collect.UseMap()`
 
   </details>
 
-- `Set` sets the value of the specified key in the map
-
-  <details>
-  <summary>Examples</summary>
-
-  ```go
-  d := map[string]int{"a": 1}
-  collect.Set(d, "b", 2)  // map[string]int{"a": 1, "b": 2}
-  ```
-
-  </details>
-
 - `Get` gets the value of the specified key in the map
 
   <details>
@@ -462,6 +532,31 @@ The corresponding chained function is `collect.UseMap()`
 
   value, ok := collect.Get(d, "a")  // 1, true
   value, ok := collect.Get(d, "b")  // 0, false
+  ```
+
+  </details>
+
+- `Put` sets the value of the specified key in the map
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  d := map[string]int{"a": 1}
+  collect.Put(d, "b", 2)  // map[string]int{"a": 1, "b": 2}
+  ```
+
+  </details>
+
+- `Pull` removes the specified key from the collection and returns its value
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  d := map[string]int{"a": 1, "b": 2}
+  v, ok := collect.Pull(d, "b")  // 2, true
+  d                              // map[string]int{"a": 1}
   ```
 
   </details>
@@ -669,6 +764,18 @@ Due to Golang's support for generics, it is [not possible to define generic type
   ```go
   d := []map[string]int{{"ID": 33, "Score": 6}, {"ID": 193, "Score": 10}, {"ID": 194, "Score": 10}}
   collect.MapGroupBy(d, "Score")  // map[6:[map[ID:33 Score:6]] 10:[map[ID:193 Score:10] map[ID:194 Score:10]]]
+  ```
+
+  </details>
+
+- `Count` counts the number of occurrences of each element in the slice
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  d := []bool{true, true, false}
+  collect.Count(d)  // map[bool]int{true: 2, false: 1}
   ```
 
   </details>
