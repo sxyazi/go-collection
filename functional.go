@@ -21,11 +21,7 @@ func Each[T ~[]E, E any](items T, callback func(value E, index int)) {
 }
 
 func Same[T ~[]E, E any](items, target T) bool {
-	if items == nil && target == nil {
-		return true
-	} else if items == nil || target == nil {
-		return false
-	} else if len(items) != len(target) {
+	if len(items) != len(target) {
 		return false
 	} else if len(items) == 0 {
 		return true
@@ -485,11 +481,7 @@ func Pull[T ~map[K]V, K comparable, V any](items T, key K) (value V, _ bool) {
 }
 
 func MapSame[T ~map[K]V, K comparable, V any](items, target T) bool {
-	if items == nil && target == nil {
-		return true
-	} else if items == nil || target == nil {
-		return false
-	} else if len(items) != len(target) {
+	if len(items) != len(target) {
 		return false
 	} else if len(items) == 0 {
 		return true
