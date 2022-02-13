@@ -271,15 +271,20 @@ The corresponding chained function is `collect.UseSlice()`
   Function signature: `Slice(items T, offset int)`
 
   ```go
-  d := []int{1, 2, 3, 4}
-  collect.Slice(d, 2)  // []int{3, 4}
+  d := []int{1, 2, 3, 4, 5}
+  collect.Slice(d, 2)   // []int{3, 4, 5}
+  collect.Slice(d, -1)  // []int{5}
+  collect.Slice(d, -2)  // []int{4, 5}
   ```
 
   Function signature: `Slice(items T, offset, length int)`
 
   ```go
-  collect.Slice(d, 0, 2)  // []int{1, 2}
-  collect.Slice(d, 2, 2)  // []int{3, 4}
+  d := []int{1, 2, 3, 4, 5}
+  collect.Slice(d, 0, 2)   // []int{1, 2}
+  collect.Slice(d, 2, 3)   // []int{3, 4, 5}
+  collect.Slice(d, 3, -2)  // []int{3, 4}
+  collect.Slice(d, -4, 3)  // []int{2, 3, 4}
   ```
 
   </details>
@@ -333,6 +338,8 @@ The corresponding chained function is `collect.UseSlice()`
   d3                                                   // []int{1, 22, 33, 55, 4}
   ```
 
+  It is worth noting that this method also supports the use of negative numbers as arguments, and its behavior is the same as that of `Slice`, which is not repeated here due to space constraints.
+
   </details>
 
 - `Reduce` reduces the collection to a single value, and the parameters of each iteration are the results of the previous iteration
@@ -357,9 +364,7 @@ The corresponding chained function is `collect.UseSlice()`
   d := []int{1, 2}
   v, ok := collect.Pop(&d)  // 2, true
   d                         // []int{1}
-  ```
 
-  ```go
   c := collect.UseSlice([]int{1, 2})
   v, ok := c.Pop()  // 2, true
   c.All()           // []int{1}
@@ -376,11 +381,8 @@ The corresponding chained function is `collect.UseSlice()`
   d := []int{1, 2}
   Push(&d, 3)
   d  // []int{1, 2, 3}
-  ```
 
-  ```go
-  c := collect.UseSlice([]int{1, 2})
-  c.Push(3).All()  // []int{1, 2, 3}
+  collect.UseSlice([]int{1, 2}).Push(3).All()  // []int{1, 2, 3}
   ```
 
   </details>

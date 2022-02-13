@@ -271,15 +271,20 @@ import collect "github.com/sxyazi/go-collection"
   函数签名：`Slice(items T, offset int)`
 
   ```go
-  d := []int{1, 2, 3, 4}
-  collect.Slice(d, 2)  // []int{3, 4}
+  d := []int{1, 2, 3, 4, 5}
+  collect.Slice(d, 2)   // []int{3, 4, 5}
+  collect.Slice(d, -1)  // []int{5}
+  collect.Slice(d, -2)  // []int{4, 5}
   ```
 
   函数签名：`Slice(items T, offset, length int)`
 
   ```go
-  collect.Slice(d, 0, 2)  // []int{1, 2}
-  collect.Slice(d, 2, 2)  // []int{3, 4}
+  d := []int{1, 2, 3, 4, 5}
+  collect.Slice(d, 0, 2)   // []int{1, 2}
+  collect.Slice(d, 2, 3)   // []int{3, 4, 5}
+  collect.Slice(d, 3, -2)  // []int{3, 4}
+  collect.Slice(d, -4, 3)  // []int{2, 3, 4}
   ```
 
   </details>
@@ -333,6 +338,8 @@ import collect "github.com/sxyazi/go-collection"
   d3                                                   // []int{1, 22, 33, 55, 4}
   ```
 
+  值得注意的是，该方法同样支持使用负数作为参数，其行为与 `Slice` 一致，受于篇幅限制这里不再赘述。
+
   </details>
 
 - Reduce：将集合减少到一个单一的值，每轮迭代的参数为上一轮迭代的结果
@@ -357,9 +364,7 @@ import collect "github.com/sxyazi/go-collection"
   d := []int{1, 2}
   v, ok := collect.Pop(&d)  // 2, true
   d                         // []int{1}
-  ```
 
-  ```go
   c := collect.UseSlice([]int{1, 2})
   v, ok := c.Pop()  // 2, true
   c.All()           // []int{1}
@@ -376,11 +381,8 @@ import collect "github.com/sxyazi/go-collection"
   d := []int{1, 2}
   Push(&d, 3)
   d  // []int{1, 2, 3}
-  ```
 
-  ```go
-  c := collect.UseSlice([]int{1, 2})
-  c.Push(3).All()  // []int{1, 2, 3}
+  collect.UseSlice([]int{1, 2}).Push(3).All()  // []int{1, 2, 3}
   ```
 
   </details>
