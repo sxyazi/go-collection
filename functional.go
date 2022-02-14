@@ -302,7 +302,7 @@ func Where[T ~[]E, E any](items T, args ...any) T {
 		// eg: Where("!=", 2)  |  Where("id", 33)
 		switch v := args[0].(type) {
 		case string:
-			if Contains([]string{"=", "!=", ">", "<", ">=", "<="}, v) {
+			if Contains([]string{"=", "!=", ">", "<", ">=", "<=", "in", "not in"}, v) {
 				operator = v
 				target = args[1]
 			} else {

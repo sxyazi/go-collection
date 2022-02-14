@@ -577,7 +577,6 @@ func TestSlice_Push(t *testing.T) {
 	}
 }
 
-// TODO: in, notin
 func TestSlice_Where(t *testing.T) {
 	// Only target
 	if !UseSlice([]int{1, 2, 3}).Where(2).Same([]int{2}) {
@@ -594,6 +593,18 @@ func TestSlice_Where(t *testing.T) {
 	if !UseSlice([]int{1, 2, 3}).Where("!=", 2).Same([]int{1, 3}) {
 		t.Fail()
 	}
+	if !UseSlice([]int{1, 2, 3}).Where("in", []int{1, 3}).Same([]int{1, 3}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).Where("in", []int{0, 2, -1}).Same([]int{2}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).Where("not in", []int{1, 3}).Same([]int{2}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).Where("not in", []int{0, 2, -1}).Same([]int{1, 3}) {
+		t.Fail()
+	}
 
 	u1 := User{1, "Hugo"}
 	u2 := User{2, "Lisa"}
@@ -602,10 +613,28 @@ func TestSlice_Where(t *testing.T) {
 	if !UseSlice([]User{u1, u2, u3, u4}).Where("!=", u2).Same([]User{u1, u3, u4}) {
 		t.Fail()
 	}
+	if !UseSlice([]User{u1, u2, u3, u4}).Where("in", []User{{5, "Kite"}, u2, u1}).Same([]User{u1, u2}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("in", nil).Same([]*User{}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("in", []*User{nil, &u3}).Same([]*User{&u3}) {
+		t.Fail()
+	}
 	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("!=", &u2).Same([]*User{&u1, &u3, &u4}) {
 		t.Fail()
 	}
 	if UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("!=", u2).Same([]*User{&u1, &u3, &u4}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("in", []*User{nil, &u2, &u1}).Same([]*User{&u1, &u2}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("not in", []*User{nil, &u2, &u1}).Same([]*User{&u3, &u4}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("not in", nil).Same([]*User{&u1, &u2, &u3, &u4}) {
 		t.Fail()
 	}
 
@@ -617,6 +646,9 @@ func TestSlice_Where(t *testing.T) {
 
 	// Key, operator and target
 	if !UseSlice(d1).Where("Name", "!=", "Lisa").Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
+		t.Fail()
+	}
+	if !UseSlice(d1).Where("Name", "in", []string{"Iris", "Hugo"}).Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
 		t.Fail()
 	}
 }

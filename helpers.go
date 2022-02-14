@@ -204,7 +204,6 @@ func AnyNumberCompare(a any, operator string, b any) bool {
 	return false
 }
 
-// TODO: Complex64 Complex128
 func Compare(a any, operator string, b any) bool {
 	in := operator == "in" || operator == "not in"
 	positive := operator == "=" || operator == "in"
