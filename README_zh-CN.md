@@ -401,7 +401,13 @@ import collect "github.com/sxyazi/go-collection"
   函数签名：`Where(items T, operator string, target any)`
 
   ```go
-  collect.Where([]int{1, 2, 3}, "!=", 2)  // []int{1, 3}
+  d := []int{1, 2, 3, 4}
+  collect.Where(d, "=", 2)   // []int{2}
+  collect.Where(d, "!=", 2)  // []int{1, 3, 4}
+  collect.Where(d, ">", 2)   // []int{3, 4}
+  collect.Where(d, ">=", 2)  // []int{2, 3, 4}
+  collect.Where(d, "<", 3)   // []int{1, 2}
+  collect.Where(d, "<=", 3)  // []int{1, 2, 3}
   ```
 
   函数签名：`Where(items T, key any, target any)`
@@ -416,6 +422,48 @@ import collect "github.com/sxyazi/go-collection"
   ```go
   d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
   collect.Where(d, "Name", "!=", "Lisa")  // []User{{1 Hugo} {3 Iris}}
+  ```
+
+  </details>
+
+- WhereIn：移除集合中不存在于指定切片中的元素
+
+  <details>
+  <summary>例子</summary>
+
+  函数签名：`WhereIn(items T, targets []any)`
+
+  ```go
+  d := []int{1, 2, 3, 4}
+  collect.WhereIn(d, []int{2, 3})  // []int{2, 3}
+  ```
+
+  函数签名：`WhereIn(items T, key any, targets []any)`
+
+  ```go
+  d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
+  collect.WhereIn(d, "Name", []string{"Hugo", "Iris"})  // []User{{1 Hugo} {3 Iris}}
+  ```
+
+  </details>
+
+- WhereNotIn：移除集合中存在于指定切片中的元素
+
+  <details>
+  <summary>例子</summary>
+
+  函数签名：`WhereNotIn(items T, targets []any)`
+
+  ```go
+  d := []int{1, 2, 3, 4}
+  collect.WhereNotIn(d, []int{2, 3})  // []int{1, 4}
+  ```
+
+  函数签名：`WhereNotIn(items T, key any, targets []any)`
+
+  ```go
+  d := []User{{ID: 1, Name: "Hugo"}, {ID: 2, Name: "Lisa"}, {ID: 3, Name: "Iris"}, {ID: 4, Name: "Lisa"}}
+  collect.WhereNotIn(d, "Name", []string{"Lisa", "Iris"})  // []User{{1 Hugo}}
   ```
 
   </details>

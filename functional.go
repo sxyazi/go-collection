@@ -280,7 +280,6 @@ func Where[T ~[]E, E any](items T, args ...any) T {
 	}
 
 	// Where(target any)
-	// eg: UseSlice([]int{1,2,3}).Where(2)
 	if len(args) == 1 {
 		return Filter(items, func(value E, _ int) bool {
 			return Compare(value, "=", args[0])
@@ -292,17 +291,15 @@ func Where[T ~[]E, E any](items T, args ...any) T {
 	var target any
 
 	// Where(key any, operator string, target any)
-	// eg: Where("id", "!=", 33)
 	if len(args) >= 3 {
 		key = args[0]
 		operator = args[1].(string)
 		target = args[2]
 	} else {
-		// Where(operator string, target any)  |  Where(key any, target any)
-		// eg: Where("!=", 2)  |  Where("id", 33)
+		// Where(operator string, target any)   |   Where(key any, target any)
 		switch v := args[0].(type) {
 		case string:
-			if Contains([]string{"=", "!=", ">", "<", ">=", "<=", "in", "not in"}, v) {
+			if Contains([]string{"=", "!=", ">", "<", ">=", "<="}, v) {
 				operator = v
 				target = args[1]
 			} else {
@@ -326,6 +323,57 @@ func Where[T ~[]E, E any](items T, args ...any) T {
 
 		return false
 	})
+}
+
+func whereIn[T ~[]E, E any](operator string, items T, args ...any) T {
+	if len(items) == 0 || len(args) == 0 {
+		return items
+	}
+
+	var key any = nil
+	var targets reflect.Value
+	if len(args) == 1 {
+		// WhereIn(targets []any)
+		targets = reflect.ValueOf(args[0])
+	} else {
+		// WhereIn(key any, targets []any)
+		key = args[0]
+		targets = reflect.ValueOf(args[1])
+	}
+
+	if (targets.Kind() != reflect.Slice && targets.Kind() != reflect.Array) || targets.Len() == 0 {
+		if operator == "=" {
+			return make(T, 0)
+		} else {
+			return items
+		}
+	}
+
+	c := NewComparisonSet(true)
+	for i := 0; i < targets.Len(); i++ {
+		c.Add(targets.Index(i).Interface())
+	}
+
+	return Filter(items, func(value E, _ int) bool {
+		if key == nil {
+			if c.Has(value) {
+				return operator == "="
+			}
+		} else if v, err := AnyGet[any](value, key); err == nil {
+			if c.Has(v) {
+				return operator == "="
+			}
+		}
+		return operator != "="
+	})
+}
+
+func WhereIn[T ~[]E, E any](items T, args ...any) T {
+	return whereIn[T, E]("=", items, args...)
+}
+
+func WhereNotIn[T ~[]E, E any](items T, args ...any) T {
+	return whereIn[T, E]("!=", items, args...)
 }
 
 /**

@@ -228,8 +228,7 @@ func TestSlice_Unique(t *testing.T) {
 		t.Fail()
 	}
 
-	s1 := []int{1, 2, 3}
-	s2 := []int{4, 5, 6}
+	s1, s2 := []int{1, 2, 3}, []int{4, 5, 6}
 	if !UseSlice([][]int{s1, s2, s1}).Unique().Same([][]int{s1, s2}) {
 		t.Fail()
 	}
@@ -240,8 +239,7 @@ func TestSlice_Unique(t *testing.T) {
 		t.Fail()
 	}
 
-	s3 := &[]int{1, 2, 3}
-	s4 := &[]int{4, 5, 6}
+	s3, s4 := &[]int{1, 2, 3}, &[]int{4, 5, 6}
 	s5 := (*s4)[:2]
 	if !UseSlice([]*[]int{s3, s4, &s5}).Unique().Same([]*[]int{s3, s4, &s5}) {
 		t.Fail()
@@ -593,48 +591,27 @@ func TestSlice_Where(t *testing.T) {
 	if !UseSlice([]int{1, 2, 3}).Where("!=", 2).Same([]int{1, 3}) {
 		t.Fail()
 	}
-	if !UseSlice([]int{1, 2, 3}).Where("in", []int{1, 3}).Same([]int{1, 3}) {
+	if !UseSlice([]int{1, 2, 3, 4}).Where(">", 2).Same([]int{3, 4}) {
 		t.Fail()
 	}
-	if !UseSlice([]int{1, 2, 3}).Where("in", []int{0, 2, -1}).Same([]int{2}) {
+	if !UseSlice([]int{1, 2, 3, 4}).Where(">=", 2).Same([]int{2, 3, 4}) {
 		t.Fail()
 	}
-	if !UseSlice([]int{1, 2, 3}).Where("not in", []int{1, 3}).Same([]int{2}) {
+	if !UseSlice([]int{1, 2, 3, 4}).Where("<", 3).Same([]int{1, 2}) {
 		t.Fail()
 	}
-	if !UseSlice([]int{1, 2, 3}).Where("not in", []int{0, 2, -1}).Same([]int{1, 3}) {
+	if !UseSlice([]int{1, 2, 3, 4}).Where("<=", 3).Same([]int{1, 2, 3}) {
 		t.Fail()
 	}
 
-	u1 := User{1, "Hugo"}
-	u2 := User{2, "Lisa"}
-	u3 := User{3, "Iris"}
-	u4 := User{4, "Lisa"}
+	u1, u2, u3, u4 := User{1, "Hugo"}, User{2, "Lisa"}, User{3, "Iris"}, User{4, "Lisa"}
 	if !UseSlice([]User{u1, u2, u3, u4}).Where("!=", u2).Same([]User{u1, u3, u4}) {
-		t.Fail()
-	}
-	if !UseSlice([]User{u1, u2, u3, u4}).Where("in", []User{{5, "Kite"}, u2, u1}).Same([]User{u1, u2}) {
-		t.Fail()
-	}
-	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("in", nil).Same([]*User{}) {
-		t.Fail()
-	}
-	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("in", []*User{nil, &u3}).Same([]*User{&u3}) {
 		t.Fail()
 	}
 	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("!=", &u2).Same([]*User{&u1, &u3, &u4}) {
 		t.Fail()
 	}
 	if UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("!=", u2).Same([]*User{&u1, &u3, &u4}) {
-		t.Fail()
-	}
-	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("in", []*User{nil, &u2, &u1}).Same([]*User{&u1, &u2}) {
-		t.Fail()
-	}
-	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("not in", []*User{nil, &u2, &u1}).Same([]*User{&u3, &u4}) {
-		t.Fail()
-	}
-	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).Where("not in", nil).Same([]*User{&u1, &u2, &u3, &u4}) {
 		t.Fail()
 	}
 
@@ -648,7 +625,76 @@ func TestSlice_Where(t *testing.T) {
 	if !UseSlice(d1).Where("Name", "!=", "Lisa").Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
 		t.Fail()
 	}
-	if !UseSlice(d1).Where("Name", "in", []string{"Iris", "Hugo"}).Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
+}
+
+func TestSlice_WhereIn(t *testing.T) {
+	// Only targets
+	if !UseSlice([]int{1, 2, 3}).WhereIn([]int{1, 3}).Same([]int{1, 3}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).WhereIn([]int{0, 2, -1}).Same([]int{2}) {
+		t.Fail()
+	}
+
+	s1, s2 := []int{1, 2, 3}, []int{4, 5, 6}
+	if !UseSlice([][]int{s1, s2}).WhereIn([][]int{s2}).Same([][]int{s2}) {
+		t.Fail()
+	}
+
+	u1, u2, u3, u4 := User{1, "Hugo"}, User{2, "Lisa"}, User{3, "Iris"}, User{4, "Lisa"}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).WhereIn([]*User{nil, &u2, &u1}).Same([]*User{&u1, &u2}) {
+		t.Fail()
+	}
+	if !UseSlice([]User{u1, u2, u3, u4}).WhereIn([]User{{5, "Kite"}, u2, u1}).Same([]User{u1, u2}) {
+		t.Fail()
+	}
+
+	// Key and targets
+	d1 := []User{u1, u2, u3, u4}
+	if !UseSlice(d1).WhereIn("Name", []string{"Iris", "Hugo"}).Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
+		t.Fail()
+	}
+
+	// Nil
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).WhereIn(nil).Same([]*User{}) {
+		t.Fail()
+	}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).WhereIn([]*User{nil, &u3}).Same([]*User{&u3}) {
+		t.Fail()
+	}
+}
+
+func TestSlice_WhereNotIn(t *testing.T) {
+	// Only targets
+	if !UseSlice([]int{1, 2, 3}).WhereNotIn([]int{1, 3}).Same([]int{2}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).WhereNotIn([]int{0, 2, -1}).Same([]int{1, 3}) {
+		t.Fail()
+	}
+	if !UseSlice([]int{1, 2, 3}).WhereNotIn([]float64{1, 2, 3.14}).Same([]int{1, 2, 3}) {
+		t.Fail()
+	}
+	if !UseSlice([]float64{1, 2, 3}).WhereNotIn([]int{1, 2, 3}).Same([]float64{1, 2, 3}) {
+		t.Fail()
+	}
+	if !UseSlice([]int64{1, 2, 3}).WhereNotIn([]int8{1, 2, 3}).Same([]int64{}) {
+		t.Fail()
+	}
+
+	u1, u2, u3, u4 := User{1, "Hugo"}, User{2, "Lisa"}, User{3, "Iris"}, User{4, "Lisa"}
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).WhereNotIn([]*User{nil, &u2, &u1}).Same([]*User{&u3, &u4}) {
+		t.Fail()
+	}
+
+	// Key and targets
+	d1 := []User{u1, u2, u3, u4}
+	if !UseSlice(d1).WhereNotIn("Name", []string{"Lisa"}).Same([]User{{1, "Hugo"}, {3, "Iris"}}) {
+		t.Fail()
+	}
+
+	// Nil
+	if !UseSlice([]*User{&u1, &u2, &u3, &u4}).WhereNotIn(nil).Same([]*User{&u1, &u2, &u3, &u4}) {
 		t.Fail()
 	}
 }

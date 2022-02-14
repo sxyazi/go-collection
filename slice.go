@@ -127,3 +127,13 @@ func (s *SliceCollection[T, E]) Where(args ...any) *SliceCollection[T, E] {
 	s.z = Where[T, E](s.z, args...)
 	return s
 }
+
+func (s *SliceCollection[T, E]) WhereIn(args ...any) *SliceCollection[T, E] {
+	s.z = WhereIn[T, E](s.z, args...)
+	return s
+}
+
+func (s *SliceCollection[T, E]) WhereNotIn(args ...any) *SliceCollection[T, E] {
+	s.z = WhereNotIn[T, E](s.z, args...)
+	return s
+}

@@ -225,15 +225,6 @@ func TestHelper_AnyNumberCompare(t *testing.T) {
 		t.Fail()
 	}
 
-	if !AnyNumberCompare(10, "in", []int{10}) {
-		t.Fail()
-	}
-	if AnyNumberCompare(10, "not in", []int64{10}) {
-		t.Fail()
-	}
-	if !AnyNumberCompare(10, "not in", []float64{10}) {
-		t.Fail()
-	}
 }
 
 func TestHelpers_Compare(t *testing.T) {
@@ -247,12 +238,6 @@ func TestHelpers_Compare(t *testing.T) {
 	if Compare(nil, ">", nil) {
 		t.Fail()
 	}
-	if Compare(nil, "in", nil) {
-		t.Fail()
-	}
-	if Compare(nil, "not in", nil) {
-		t.Fail()
-	}
 
 	// Slice
 	d1 := []int{1, 2, 3}
@@ -260,12 +245,6 @@ func TestHelpers_Compare(t *testing.T) {
 		t.Fail()
 	}
 	if Compare(d1, "=", []int{4, 5, 6}) {
-		t.Fail()
-	}
-	if !Compare(d1, "in", [][]int{{4, 5, 6}, d1}) {
-		t.Fail()
-	}
-	if Compare(d1, "not in", [][]int{{4, 5, 6}, d1}) {
 		t.Fail()
 	}
 
@@ -280,12 +259,6 @@ func TestHelpers_Compare(t *testing.T) {
 	if Compare(d2, "=", [...]int{4, 5, 6}) {
 		t.Fail()
 	}
-	if Compare(d2, "in", [...][3]int{{4, 5, 6}}) {
-		t.Fail()
-	}
-	if !Compare(d2, "in", [...][3]int{{4, 5, 6}, d2}) {
-		t.Fail()
-	}
 
 	// Channel
 	d3 := make(chan int)
@@ -296,12 +269,6 @@ func TestHelpers_Compare(t *testing.T) {
 		t.Fail()
 	}
 	if Compare(d3, "=", make(chan int)) {
-		t.Fail()
-	}
-	if Compare(d3, "in", []chan int{make(chan int)}) {
-		t.Fail()
-	}
-	if Compare(d3, "not in", []chan int{make(chan int), d3}) {
 		t.Fail()
 	}
 
@@ -328,15 +295,6 @@ func TestHelpers_Compare(t *testing.T) {
 	if Compare(d5, "!=", 3.14) {
 		t.Fail()
 	}
-	if Compare(d5, "in", false) {
-		t.Fail()
-	}
-	if !Compare(d5, "in", []float64{3.14}) {
-		t.Fail()
-	}
-	if !Compare(d5, "not in", []interface{}{3.14}) {
-		t.Fail()
-	}
 
 	// Map
 	d6 := map[string]string{"name": "Lucy"}
@@ -349,12 +307,6 @@ func TestHelpers_Compare(t *testing.T) {
 	if !Compare(d6, "!=", nil) {
 		t.Fail()
 	}
-	if Compare(d6, "in", nil) {
-		t.Fail()
-	}
-	if !Compare(d6, "not in", nil) {
-		t.Fail()
-	}
 
 	// Struct
 	d7 := struct{ Name string }{"Lucy"}
@@ -365,12 +317,6 @@ func TestHelpers_Compare(t *testing.T) {
 		t.Fail()
 	}
 	if !Compare(d7, "!=", nil) {
-		t.Fail()
-	}
-	if Compare(d7, "in", nil) {
-		t.Fail()
-	}
-	if !Compare(d7, "not in", nil) {
 		t.Fail()
 	}
 
@@ -389,12 +335,6 @@ func TestHelpers_Compare(t *testing.T) {
 		t.Fail()
 	}
 	if !Compare(d8, "!=", nil) {
-		t.Fail()
-	}
-	if Compare(d8, "in", nil) {
-		t.Fail()
-	}
-	if !Compare(d8, "not in", nil) {
 		t.Fail()
 	}
 }
