@@ -63,17 +63,21 @@ func OffsetToIndex(actual, offset int, args ...int) (int, int) {
 	if len(args) >= 1 {
 		length = args[0]
 	}
-
-	if actual == 0 {
-		return 0, 0
-	} else if length == 0 || offset >= actual || offset < -actual || (offset == 0 && length < 0) {
+	if actual == 0 || (offset == 0 && length < 0) {
 		return 0, 0
 	}
 
-	// negative offset and length
+	// negative offset
 	if offset < 0 {
-		offset = actual + offset
+		offset += actual
 	}
+	if offset >= actual || offset < 0 {
+		return 0, 0
+	} else if length == 0 {
+		return offset, offset
+	}
+
+	// negative length
 	if length < 0 {
 		if offset+length < 0 {
 			offset, length = 0, offset+1

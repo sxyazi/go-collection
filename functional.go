@@ -200,7 +200,7 @@ func Splice[T ~[]E, E any](items *T, offset int, args ...any) T {
 		return slice
 	}
 
-	reps := (*items)[:start]
+	var reps T
 	for _, rep := range args[1:] {
 		switch v := rep.(type) {
 		case E:
@@ -212,7 +212,8 @@ func Splice[T ~[]E, E any](items *T, offset int, args ...any) T {
 		}
 	}
 
-	*items = append(reps, (*items)[end:]...)
+	reps = append(reps, (*items)[end:]...)
+	*items = append((*items)[:start], reps...)
 	return slice
 }
 

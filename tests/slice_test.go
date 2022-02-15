@@ -551,6 +551,10 @@ func TestSlice_Splice(t *testing.T) {
 		t.Fail()
 	}
 	s = UseSlice([]int{1, 2, 3, 4})
+	if !s.Splice(1, 0, []int{22, 33}).Same([]int{}) || !s.Same([]int{1, 22, 33, 2, 3, 4}) {
+		t.Fail()
+	}
+	s = UseSlice([]int{1, 2, 3, 4})
 	if !s.Splice(1, 2, 22, 33).Same([]int{2, 3}) || !s.Same([]int{1, 22, 33, 4}) {
 		t.Fail()
 	}
