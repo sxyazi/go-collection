@@ -2,6 +2,7 @@ package collect
 
 import (
 	"golang.org/x/exp/constraints"
+	"math"
 	"reflect"
 )
 
@@ -16,10 +17,26 @@ func IsNumber(v any) bool {
 
 func NumberCompare[T constraints.Integer | constraints.Float](a T, operator string, b T) bool {
 	switch operator {
-	case "=":
-		return a == b
-	case "!=":
-		return a != b
+	case "=", "!=":
+		var eq bool
+		switch av := any(a).(type) {
+		case float64:
+			if math.IsNaN(av) && math.IsNaN(any(b).(float64)) {
+				eq = true
+			} else {
+				eq = math.Abs(av-any(b).(float64)) <= 1e-9
+			}
+		case float32:
+			eq = math.Abs(float64(av)-float64(any(b).(float32))) <= 1e-9
+		default:
+			eq = a == b
+		}
+
+		if operator == "=" {
+			return eq
+		} else {
+			return !eq
+		}
 	case "<":
 		return a < b
 	case "<=":
@@ -75,11 +92,12 @@ func Compare(a any, operator string, b any) bool {
 	}
 
 	ar, br := reflect.TypeOf(a), reflect.TypeOf(b)
-	if ar.Kind() != br.Kind() {
+	ak, bk := ar.Kind(), br.Kind()
+	if ak != bk {
 		return operator == "!="
 	}
 
-	if !Contains([]reflect.Kind{reflect.Slice, reflect.Map, reflect.Func}, ar.Kind()) {
+	if ak != reflect.Slice && ak != reflect.Map && ak != reflect.Func {
 		switch operator {
 		case "=":
 			return a == b
@@ -104,9 +122,9 @@ type ComparisonSet struct {
 	z           map[any]map[reflect.Kind]struct{}
 }
 
-func (c *ComparisonSet) normalize(v reflect.Value) (reflect.Kind, any) {
+func (c *ComparisonSet) Normalize(v reflect.Value) (reflect.Kind, any) {
 	kind := v.Kind()
-	if kind == reflect.Func || kind == reflect.Map || kind == reflect.Slice {
+	if kind == reflect.Slice || kind == reflect.Func || kind == reflect.Map {
 		return kind, v.UnsafePointer()
 	}
 
@@ -125,7 +143,7 @@ func (c *ComparisonSet) normalize(v reflect.Value) (reflect.Kind, any) {
 }
 
 func (c *ComparisonSet) Add(v any) {
-	kind, value := c.normalize(reflect.ValueOf(v))
+	kind, value := c.Normalize(reflect.ValueOf(v))
 	if _, ok := c.z[value]; !ok {
 		c.z[value] = make(map[reflect.Kind]struct{})
 	}
@@ -134,7 +152,7 @@ func (c *ComparisonSet) Add(v any) {
 }
 
 func (c *ComparisonSet) Has(v any) bool {
-	kind, value := c.normalize(reflect.ValueOf(v))
+	kind, value := c.Normalize(reflect.ValueOf(v))
 	if m, ok := c.z[value]; ok {
 		_, ok := m[kind]
 		return ok

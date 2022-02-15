@@ -6,7 +6,7 @@ type MapCollection[T ~map[K]V, K comparable, V any] struct {
 	z T
 }
 
-func UseMap[T ~map[K]V, K, V comparable](items T) *MapCollection[T, K, V] {
+func UseMap[T ~map[K]V, K comparable, V any](items T) *MapCollection[T, K, V] {
 	return &MapCollection[T, K, V]{items}
 }
 

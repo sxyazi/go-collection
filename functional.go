@@ -33,22 +33,8 @@ func Same[T ~[]E, E any](items, target T) bool {
 	}
 
 	for index, item := range items {
-		switch kind {
-		case reflect.Float32:
-			if math.Abs(float64(any(item).(float32))-float64(any(target[index]).(float32))) > 1e-9 {
-				return false
-			}
-		case reflect.Float64:
-			if math.IsNaN(any(item).(float64)) && !math.IsNaN(any(target[index]).(float64)) {
-				return false
-			}
-			if math.Abs(any(item).(float64)-any(target[index]).(float64)) > 1e-9 {
-				return false
-			}
-		default:
-			if any(item) != any(target[index]) {
-				return false
-			}
+		if Compare(item, "!=", target[index]) {
+			return false
 		}
 	}
 	return true
@@ -75,36 +61,12 @@ func Last[T ~[]E, E any](items T) (E, bool) {
 }
 
 func Index[T ~[]E, E any](items T, target E) int {
-	if items == nil {
+	if len(items) == 0 {
 		return -1
 	}
 
-	r1 := reflect.ValueOf(target)
-	kind := reflect.TypeOf(items).Elem().Kind()
 	for index, item := range items {
-		if kind == reflect.Float64 {
-			if math.Abs(any(target).(float64)-any(item).(float64)) <= 1e-9 {
-				return index
-			}
-			continue
-		} else if kind == reflect.Float32 {
-			if math.Abs(float64(any(target).(float32))-float64(any(item).(float32))) <= 1e-9 {
-				return index
-			}
-			continue
-		} else if kind != reflect.Slice {
-			if any(target) == any(item) {
-				return index
-			}
-			continue
-		}
-
-		r2 := reflect.ValueOf(item)
-		if r1.IsNil() != r2.IsNil() {
-			continue
-		} else if r1.Len() != r2.Len() {
-			continue
-		} else if r1.UnsafePointer() == r2.UnsafePointer() {
+		if Compare(item, "=", target) {
 			return index
 		}
 	}
@@ -148,30 +110,35 @@ func Map[T ~[]E, E any](items T, callback func(value E, index int) E) T {
 }
 
 func Unique[T ~[]E, E any](items T) T {
-	if items == nil {
+	if len(items) == 0 {
 		return items
 	}
 
-	set := make(map[any]struct{})
-	kind := reflect.TypeOf(items).Elem().Kind()
-	return Filter(items, func(value E, index int) bool {
-		switch kind {
-		case reflect.Slice:
-			p := reflect.ValueOf(value).UnsafePointer()
-			if _, ok := set[p]; !ok {
-				set[p] = struct{}{}
-				return true
-			}
-
-		default:
-			if _, ok := set[value]; !ok {
-				set[value] = struct{}{}
-				return true
-			}
+	c := NewComparisonSet(true)
+	return Filter(items, func(value E, _ int) bool {
+		if !c.Has(value) {
+			c.Add(value)
+			return true
 		}
-
 		return false
 	})
+}
+
+func Duplicates[T ~[]E, E any](items T) map[int]E {
+	m := make(map[int]E)
+	if len(items) == 0 {
+		return m
+	}
+
+	c := NewComparisonSet(true)
+	for index, item := range items {
+		if c.Has(item) {
+			m[index] = item
+		} else {
+			c.Add(item)
+		}
+	}
+	return m
 }
 
 func Merge[T ~[]E, E any](items T, targets ...T) T {
@@ -541,29 +508,13 @@ func MapSame[T ~map[K]V, K comparable, V any](items, target T) bool {
 	}
 
 	for index, item := range items {
-		tv, ok := target[index]
-		if !ok {
+		if tv, ok := target[index]; !ok {
+			return false
+		} else if Compare(item, "!=", tv) {
 			return false
 		}
-
-		switch kind {
-		case reflect.Float32:
-			if math.Abs(float64(any(item).(float32))-float64(any(tv).(float32))) > 1e-9 {
-				return false
-			}
-		case reflect.Float64:
-			if math.IsNaN(any(item).(float64)) && !math.IsNaN(any(tv).(float64)) {
-				return false
-			}
-			if math.Abs(any(item).(float64)-any(tv).(float64)) > 1e-9 {
-				return false
-			}
-		default:
-			if any(item) != any(tv) {
-				return false
-			}
-		}
 	}
+
 	return true
 }
 

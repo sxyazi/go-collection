@@ -244,6 +244,37 @@ func TestSlice_Unique(t *testing.T) {
 	if !UseSlice([]*[]int{s3, s4, &s5}).Unique().Same([]*[]int{s3, s4, &s5}) {
 		t.Fail()
 	}
+
+	if !UseSlice([]any{s1, s1, s2, s3, s3, s4, s5, &s5}).Unique().Same([]any{s1, s2, s3, s4, s5, &s5}) {
+		t.Fail()
+	}
+}
+
+func TestSlice_Duplicates(t *testing.T) {
+	if !UseSlice([]int{1, 2, 2, 3}).Duplicates().Same(map[int]int{2: 2}) {
+		t.Fail()
+	}
+
+	s1, s2 := []int{1, 2, 3}, []int{4, 5, 6}
+	if !UseSlice([][]int{s1, s2, s1}).Duplicates().Same(map[int][]int{2: s1}) {
+		t.Fail()
+	}
+	if !UseSlice([][]int{s1, nil, s2, nil, s1}).Duplicates().Same(map[int][]int{3: nil, 4: s1}) {
+		t.Fail()
+	}
+	if !UseSlice([]*[]int{&s1, &s2, &s1}).Duplicates().Same(map[int]*[]int{2: &s1}) {
+		t.Fail()
+	}
+
+	s3, s4 := &[]int{1, 2, 3}, &[]int{4, 5, 6}
+	s5 := (*s4)[:2]
+	if !UseSlice([]*[]int{s3, s4, &s5}).Duplicates().Same(map[int]*[]int{}) {
+		t.Fail()
+	}
+
+	if !UseSlice([]any{s1, s1, s2, s3, s3, s4, s5, &s5}).Duplicates().Same(map[int]any{1: s1, 4: s3}) {
+		t.Fail()
+	}
 }
 
 func TestSlice_Merge(t *testing.T) {

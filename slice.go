@@ -78,6 +78,10 @@ func (s *SliceCollection[T, E]) Unique() *SliceCollection[T, E] {
 	return s
 }
 
+func (s *SliceCollection[T, E]) Duplicates() *MapCollection[map[int]E, int, E] {
+	return UseMap[map[int]E, int, E](Duplicates[T, E](s.z))
+}
+
 func (s *SliceCollection[T, E]) Merge(targets ...T) *SliceCollection[T, E] {
 	s.z = Merge[T, E](s.z, targets...)
 	return s
