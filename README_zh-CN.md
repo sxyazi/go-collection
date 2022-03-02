@@ -208,6 +208,18 @@ import collect "github.com/sxyazi/go-collection"
 
   </details>
 
+- Duplicates：获取切片中的重复元素
+
+  <details>
+  <summary>例子</summary>
+
+  ```go
+  d := []string{"a", "b", "a", "c"}
+  collect.Duplicates()  // map[int]string{2: "a"}
+  ```
+
+  </details>
+
 - Merge：将当前切片与其它切片合并
 
   <details>

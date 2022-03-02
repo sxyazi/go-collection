@@ -254,6 +254,9 @@ func TestSlice_Duplicates(t *testing.T) {
 	if !UseSlice([]int{1, 2, 2, 3}).Duplicates().Same(map[int]int{2: 2}) {
 		t.Fail()
 	}
+	if !UseSlice([]string{"a", "b", "a", "c"}).Duplicates().Same(map[int]string{2: "a"}) {
+		t.Fail()
+	}
 
 	s1, s2 := []int{1, 2, 3}, []int{4, 5, 6}
 	if !UseSlice([][]int{s1, s2, s1}).Duplicates().Same(map[int][]int{2: s1}) {

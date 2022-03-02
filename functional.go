@@ -567,7 +567,7 @@ func Count[T ~[]E, E comparable](items T) map[E]int {
 	return times
 }
 
-func Times[T ~[]E, E any](number int, callback func(number int) E) *SliceCollection[T, E] {
+func Times[T []E, E any](number int, callback func(number int) E) *SliceCollection[T, E] {
 	items := make(T, number)
 	for i := 0; i < number; i++ {
 		items[i] = callback(i + 1)

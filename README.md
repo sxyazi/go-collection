@@ -196,7 +196,7 @@ The corresponding chained function is `collect.UseSlice()`
 
   </details>
 
-- `Unique` removes duplicate elements from slices
+- `Unique` removes duplicate elements in the slice
 
   <details>
   <summary>Examples</summary>
@@ -204,6 +204,18 @@ The corresponding chained function is `collect.UseSlice()`
   ```go
   d := []int{1, 2, 3, 3, 4}
   collect.Unique(d)  // []int{1, 2, 3, 4}
+  ```
+
+  </details>
+
+- `Duplicates` gets the duplicate elements in the slice
+
+  <details>
+  <summary>Examples</summary>
+
+  ```go
+  d := []string{"a", "b", "a", "c"}
+  collect.Duplicates(d)  // map[int]string{2: "a"}
   ```
 
   </details>
@@ -830,7 +842,7 @@ Due to Golang's support for generics, it is [not possible to define generic type
 
   </details>
 
-- `Times` creates a new collection of slices by calling the callback with specified number of times
+- `Times` creates a new collection of slice by calling the callback with specified number of times
 
   <details>
   <summary>Examples</summary>

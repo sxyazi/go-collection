@@ -1,7 +1,7 @@
 package tests
 
 type Foo struct {
-	Bar any
+	Bar string
 }
 
 type User struct {
