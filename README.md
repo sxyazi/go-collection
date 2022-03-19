@@ -14,10 +14,6 @@ Equivalent to:
 collect.UseSlice([]int{1, 2, 3}).Map(fn).Filter(fn).Reduce(fn)
 ```
 
-**_Note: Since Go 1.18 has not yet been officially released and its language behavior may still change after the release, go-collection is currently for trial use only. If you have additional questions or suggestions, please [file an issue](https://github.com/sxyazi/go-collection/issues/new)._**
-
-**_Note: Go 1.18 Beta 2, released this past week, still has some bugs, so you will need to use the [gotip](https://pkg.go.dev/golang.org/dl/gotip) tool to get the latest master branch of Go when trying out go-collection._**
-
 ## Installation
 
 ```shell

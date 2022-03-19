@@ -14,10 +14,6 @@ collect.Reduce(collect.Filter(collect.Map([]int{1, 2, 3}, fn), fn), fn)
 collect.UseSlice([]int{1, 2, 3}).Map(fn).Filter(fn).Reduce(fn)
 ```
 
-**_注意：由于 Go 1.18 还未正式发布，其语言行为仍可能在发布后产生变化，因此目前 go-collection 仅作试用用途。如果您有其它的疑问或建议，请[创建一个 issue](https://github.com/sxyazi/go-collection/issues/new)。_**
-
-**_注意：过去一周发布的 Go 1.18 Beta 2 仍存在一些 Bug，因此在试用 go-collection 时，您需要使用 [gotip](https://pkg.go.dev/golang.org/dl/gotip) 工具获取 Go 最新的 master 分支版本。_**
-
 ## 安装
 
 ```shell
