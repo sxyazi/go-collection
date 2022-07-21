@@ -32,6 +32,9 @@ func TestHelpers_AnyGet(t *testing.T) {
 	if v, err := AnyGet[*User](users, 0); err != nil || v != &user {
 		t.Fail()
 	}
+	if v, err := AnyGet[*User](users, "0"); err != nil || v != &user {
+		t.Fail()
+	}
 	if _, err := AnyGet[*User](users, 10); err == nil {
 		t.Fail()
 	}
@@ -41,6 +44,9 @@ func TestHelpers_AnyGet(t *testing.T) {
 		t.Fail()
 	}
 	if v, err := AnyGet[int]([3]int{1, 2, 3}, 2); err != nil || v != 3 {
+		t.Fail()
+	}
+	if v, err := AnyGet[int]([3]int{1, 2, 3}, "2"); err != nil || v != 3 {
 		t.Fail()
 	}
 	if v, err := AnyGet[any]([3]int{1, 2, 3}, 2); err != nil || v.(int) != 3 {

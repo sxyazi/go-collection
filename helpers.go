@@ -19,7 +19,7 @@ func AnyGet[V, K any](item any, key K) (zero V, _ error) {
 			return zero, errors.New("invalid map index")
 		}
 	case reflect.Array, reflect.Slice:
-		if index, err := strconv.Atoi(fmt.Sprintf("%d", key)); err != nil {
+		if index, err := strconv.Atoi(fmt.Sprintf("%v", key)); err != nil {
 			return zero, err
 		} else {
 			if index < 0 || index >= ref.Len() {
@@ -29,7 +29,7 @@ func AnyGet[V, K any](item any, key K) (zero V, _ error) {
 			result = ref.Index(index).Interface()
 		}
 	case reflect.Struct:
-		if r := ref.FieldByName(fmt.Sprintf("%s", key)); r.IsValid() {
+		if r := ref.FieldByName(fmt.Sprintf("%v", key)); r.IsValid() {
 			result = r.Interface()
 		} else {
 			return zero, errors.New("invalid struct field")
