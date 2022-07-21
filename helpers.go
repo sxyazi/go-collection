@@ -48,7 +48,7 @@ func AnyGet[V, K any](item any, key K) (zero V, _ error) {
 	}
 }
 
-func Pluck[V, K, I comparable](items []I, key K) []V {
+func Pluck[V, K, I any](items []I, key K) []V {
 	var zero V
 	plucked := make([]V, len(items), cap(items))
 
@@ -63,7 +63,7 @@ func Pluck[V, K, I comparable](items []I, key K) []V {
 	return plucked
 }
 
-func MapPluck[K, V comparable](items []map[K]V, key K) []V {
+func MapPluck[K comparable, V any](items []map[K]V, key K) []V {
 	var zero V
 	plucked := make([]V, len(items), cap(items))
 
@@ -78,7 +78,7 @@ func MapPluck[K, V comparable](items []map[K]V, key K) []V {
 	return plucked
 }
 
-func KeyBy[V, K, I comparable](items []I, key K) map[V]I {
+func KeyBy[V comparable, K, I any](items []I, key K) map[V]I {
 	result := make(map[V]I)
 	for _, item := range items {
 		if v, err := AnyGet[V](item, key); err == nil {
@@ -96,7 +96,7 @@ func MapKeyBy[K, V comparable](items []map[K]V, key K) map[V]map[K]V {
 	return result
 }
 
-func GroupBy[V, K, I comparable](items []I, key K) map[V][]I {
+func GroupBy[V comparable, K, I any](items []I, key K) map[V][]I {
 	result := make(map[V][]I)
 	for _, item := range items {
 		if v, err := AnyGet[V](item, key); err == nil {
